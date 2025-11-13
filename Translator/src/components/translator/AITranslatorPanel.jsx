@@ -3,6 +3,7 @@ import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { base44 } from '@/api/base44Client';
 
@@ -32,6 +33,7 @@ export default function AITranslatorPanel({ mode }) {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sentenceLimit, setSentenceLimit] = useState('');
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -43,8 +45,15 @@ export default function AITranslatorPanel({ mode }) {
     setOutputText('');
 
     try {
+      let fullPrompt = mode.prompt;
+      
+      // Add sentence limit instruction if specified
+      if (sentenceLimit && parseInt(sentenceLimit) > 0) {
+        fullPrompt = `${mode.prompt} IMPORTANT: Limit your response to exactly ${sentenceLimit} sentence${parseInt(sentenceLimit) === 1 ? '' : 's'}.`;
+      }
+      
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `${mode.prompt}\n\n${inputText}`,
+        prompt: `${fullPrompt}\n\n${inputText}`,
       });
 
       setOutputText(result);
@@ -90,6 +99,24 @@ export default function AITranslatorPanel({ mode }) {
           className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none ${borderColor}`}
           placeholder={mode.placeholder}
         />
+      </div>
+
+      {/* Sentence Limit Input */}
+      <div className="space-y-2">
+        <Label htmlFor={`${mode.id}-sentence-limit`} className="text-slate-300 font-medium">
+          Sentence Limit (Optional)
+        </Label>
+        <Input
+          id={`${mode.id}-sentence-limit`}
+          type="number"
+          min="1"
+          max="100"
+          value={sentenceLimit}
+          onChange={(e) => setSentenceLimit(e.target.value)}
+          className="bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 w-32"
+          placeholder="No limit"
+        />
+        <p className="text-xs text-slate-500">Limit the response to a specific number of sentences</p>
       </div>
 
       {/* Translate Button */}
