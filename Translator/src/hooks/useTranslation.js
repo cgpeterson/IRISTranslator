@@ -24,11 +24,22 @@ export function useTranslation(mode) {
     setOutputText('');
 
     try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `${mode.prompt}\n\n${inputText}`,
+      // Check if mode uses systemInstruction (fantasy personas) or traditional prompt
+      const invocationParams = {
         modelId: currentModel.id,
         sentenceLimit: sentenceLimit,
-      });
+      };
+
+      if (mode.systemInstruction) {
+        // For fantasy personas and modes with system instructions
+        invocationParams.prompt = inputText;
+        invocationParams.systemInstruction = mode.systemInstruction;
+      } else {
+        // For traditional modes with prompts
+        invocationParams.prompt = `${mode.prompt}\n\n${inputText}`;
+      }
+
+      const result = await base44.integrations.Core.InvokeLLM(invocationParams);
 
       setOutputText(result);
     } catch (error) {
