@@ -1,31 +1,27 @@
-import React, { useState } from 'react';
-import { ChevronDown, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { toast } from 'sonner';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 import Base64Panel from '../components/translator/Base64Panel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
 
 export default function Translator() {
-  const [openCategories, setOpenCategories] = useState({
-    encoding: true,
-    literary: false,
-    dialects: false,
-    decode: false,
-  });
+  const [selectedCategory, setSelectedCategory] = useState('encoding');
+  const [selectedMode, setSelectedMode] = useState('base64');
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const dropdownRef = useRef(null);
 
-  const toggleCategory = (category) => {
-    setOpenCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  };
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const translationModes = {
     encoding: [
@@ -130,69 +126,93 @@ export default function Translator() {
     },
   };
 
+  const handleCategorySelect = (category, modeId) => {
+    setSelectedCategory(category);
+    setSelectedMode(modeId);
+    setOpenDropdown(null);
+  };
+
+  const toggleDropdown = (category) => {
+    setOpenDropdown(openDropdown === category ? null : category);
+  };
+
+  const currentMode = translationModes[selectedCategory]?.find(
+    (mode) => mode.id === selectedMode
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-6 md:px-6 md:py-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+      {/* Header with Menu Bar */}
+      <div className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 py-4 md:px-6">
+          <div className="text-center mb-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
               Chat Translator
             </h1>
-            <p className="text-slate-400 text-sm md:text-base">
+            <p className="text-slate-400 text-xs md:text-sm">
               Transform your text with encoding, literary styles, and regional dialects
             </p>
           </div>
+
+          {/* Menu Bar */}
+          <nav ref={dropdownRef} className="flex justify-center gap-2 flex-wrap">
+            {Object.entries(translationModes).map(([category, modes]) => (
+              <div key={category} className="relative">
+                <button
+                  onClick={() => toggleDropdown(category)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-slate-700 text-white'
+                      : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/70 hover:text-white'
+                  }`}
+                >
+                  <span className="text-lg">{categoryInfo[category].icon}</span>
+                  <span className="font-medium text-sm md:text-base">
+                    {categoryInfo[category].title}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      openDropdown === category ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {openDropdown === category && (
+                  <div className="absolute top-full mt-2 left-0 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] overflow-hidden z-50">
+                    {modes.map((mode) => (
+                      <button
+                        key={mode.id}
+                        onClick={() => handleCategorySelect(category, mode.id)}
+                        className={`w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors ${
+                          selectedMode === mode.id && selectedCategory === category
+                            ? 'bg-slate-700 text-white'
+                            : 'text-slate-300'
+                        }`}
+                      >
+                        <div className="font-medium text-sm">{mode.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Single Panel */}
       <div className="max-w-5xl mx-auto px-4 py-8 md:px-6">
-        <div className="space-y-4">
-          {Object.entries(translationModes).map(([category, modes]) => (
-            <Collapsible
-              key={category}
-              open={openCategories[category]}
-              onOpenChange={() => toggleCategory(category)}
-              className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden"
-            >
-              <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-800/70 transition-colors">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{categoryInfo[category].icon}</span>
-                  <div className="text-left">
-                    <h2 className="text-lg font-semibold text-white">
-                      {categoryInfo[category].title}
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                      {categoryInfo[category].description}
-                    </p>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 text-slate-400 transition-transform ${
-                    openCategories[category] ? 'rotate-180' : ''
-                  }`}
-                />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="p-6 space-y-6 border-t border-slate-700">
-                  {modes.map((mode) => (
-                    <div key={mode.id}>
-                      {mode.isBase64 ? (
-                        <Base64Panel />
-                      ) : (
-                        <AITranslatorPanel mode={mode} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 p-6">
+          {currentMode?.isBase64 ? (
+            <Base64Panel />
+          ) : (
+            currentMode && <AITranslatorPanel mode={currentMode} />
+          )}
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-center text-slate-500 text-sm">
+        <div className="mt-8 text-center text-slate-500 text-sm">
           <p>All translations happen in real-time. No data is stored.</p>
         </div>
       </div>
