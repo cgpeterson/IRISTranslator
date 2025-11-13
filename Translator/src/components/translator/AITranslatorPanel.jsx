@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,10 +8,14 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { copyToClipboard } from '@/utils/clipboard';
 import { colorMap, buttonColorMap } from '@/config/colorMaps';
 import { useModel } from '@/contexts/ModelContext';
+import { SPORTS_PERSONAS } from '@/data/sportsPrompts';
 
 export default function AITranslatorPanel({ mode }) {
-  const { inputText, setInputText, outputText, isLoading, handleTranslate } = useTranslation(mode);
+  const [selectedPersona, setSelectedPersona] = useState('hype_man');
+  const { inputText, setInputText, outputText, isLoading, handleTranslate } = useTranslation(mode, selectedPersona);
   const { sentenceLimit, updateSentenceLimit } = useModel();
+  
+  const isSportsMode = mode.mode === 'sports';
 
   const borderColor = colorMap[mode.color] || colorMap.blue;
   const buttonColor = buttonColorMap[mode.color] || buttonColorMap.blue;
@@ -35,6 +39,30 @@ export default function AITranslatorPanel({ mode }) {
         <Sparkles className={`w-5 h-5 text-${mode.color}-500`} />
         <h3 className="text-xl font-semibold text-white">{mode.name}</h3>
       </div>
+
+      {/* Persona Selector for Sports Mode */}
+      {isSportsMode && (
+        <div className="space-y-2">
+          <Label htmlFor="persona-selector" className="text-slate-300 font-medium text-sm">
+            Commentary Style
+          </Label>
+          <select
+            id="persona-selector"
+            value={selectedPersona}
+            onChange={(e) => setSelectedPersona(e.target.value)}
+            className="bg-slate-900/50 border border-slate-600 text-white rounded-md px-3 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-slate-500"
+          >
+            {Object.entries(SPORTS_PERSONAS).map(([key, persona]) => (
+              <option key={key} value={key}>
+                {persona.icon} {persona.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-slate-500">
+            Choose your sports broadcasting style
+          </p>
+        </div>
+      )}
 
       {/* Max Sentences Control */}
       <div className="space-y-2">

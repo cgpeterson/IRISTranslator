@@ -79,5 +79,16 @@ export const translationModes = {
       outputLabel: 'Clear Modern English',
       placeholder: 'Paste Base64, Pirate, Shakespearian, etc...',
     }
+  ],
+  sports: [
+    {
+      id: 'sports',
+      name: 'Sports Talk',
+      color: 'orange',
+      mode: 'sports',
+      inputLabel: 'Your Text',
+      outputLabel: 'Sports Commentary',
+      placeholder: 'Enter text to transform into sports talk...',
+    }
   ]
 };
