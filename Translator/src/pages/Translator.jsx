@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
 import Base64Panel from '../components/translator/Base64Panel';
+import EncodingPanel from '../components/translator/EncodingPanel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
 
 export default function Translator() {
@@ -31,9 +32,33 @@ export default function Translator() {
     encoding: [
       {
         id: 'base64',
-        name: 'Base64 Encoder/Decoder',
+        name: 'Base64',
+        encodingType: 'base64',
         color: 'blue',
-        isBase64: true,
+      },
+      {
+        id: 'url',
+        name: 'URL Encoding',
+        encodingType: 'url',
+        color: 'indigo',
+      },
+      {
+        id: 'html',
+        name: 'HTML Entity',
+        encodingType: 'html',
+        color: 'violet',
+      },
+      {
+        id: 'hex',
+        name: 'Hexadecimal',
+        encodingType: 'hex',
+        color: 'sky',
+      },
+      {
+        id: 'binary',
+        name: 'Binary',
+        encodingType: 'binary',
+        color: 'emerald',
       }
     ],
     literary: [
@@ -110,7 +135,7 @@ export default function Translator() {
   const categoryInfo = {
     encoding: {
       title: 'Encoding',
-      description: 'Encode and decode text',
+      description: 'Base64, URL, HTML, Hex, and Binary encoding',
       icon: '🔐',
     },
     literary: {
@@ -178,8 +203,12 @@ export default function Translator() {
                 <div className="p-6 space-y-6 border-t border-slate-700">
                   {modes.map((mode) => (
                     <div key={mode.id}>
-                      {mode.isBase64 ? (
-                        <Base64Panel />
+                      {mode.encodingType ? (
+                        <EncodingPanel 
+                          encodingType={mode.encodingType}
+                          color={mode.color}
+                          name={mode.name}
+                        />
                       ) : (
                         <AITranslatorPanel mode={mode} />
                       )}

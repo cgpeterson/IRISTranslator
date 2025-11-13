@@ -130,13 +130,13 @@ export default function EncodingPanel({ encodingType, color, name }) {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">{name}</h2>
-        <p className="text-gray-400 text-sm mt-1">Real-time encoding and decoding</p>
+        <p className="text-slate-400 text-sm mt-1">Real-time encoding and decoding</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 relative">
         {/* Plain Text */}
         <div className="space-y-3">
-          <Label htmlFor="plain-text" className="text-gray-300 font-medium">
+          <Label htmlFor="plain-text" className="text-slate-300 font-medium">
             Plain Text
           </Label>
           <Textarea
@@ -144,13 +144,13 @@ export default function EncodingPanel({ encodingType, color, name }) {
             value={plainText}
             onChange={(e) => setPlainText(e.target.value)}
             rows={8}
-            className={`bg-gray-700 border-gray-600 text-white placeholder-gray-400 resize-none ${borderColor}`}
+            className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none ${borderColor}`}
             placeholder="Enter text to encode..."
           />
           <Button
             onClick={() => copyToClipboard(plainText)}
             variant="outline"
-            className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
             disabled={!plainText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
@@ -167,7 +167,7 @@ export default function EncodingPanel({ encodingType, color, name }) {
 
         {/* Encoded Text */}
         <div className="space-y-3">
-          <Label htmlFor="encoded-text" className="text-gray-300 font-medium">
+          <Label htmlFor="encoded-text" className="text-slate-300 font-medium">
             {name} Encoded
           </Label>
           <Textarea
@@ -175,13 +175,13 @@ export default function EncodingPanel({ encodingType, color, name }) {
             value={encodedText}
             onChange={(e) => handleEncodedChange(e.target.value)}
             rows={8}
-            className={`bg-gray-700 border-gray-600 text-white placeholder-gray-400 resize-none font-mono text-sm ${borderColor}`}
+            className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none font-mono text-sm ${borderColor}`}
             placeholder="Encoded text appears here..."
           />
           <Button
             onClick={() => copyToClipboard(encodedText)}
             variant="outline"
-            className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
             disabled={!encodedText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
@@ -190,7 +190,7 @@ export default function EncodingPanel({ encodingType, color, name }) {
         </div>
       </div>
 
-      <div className="text-center text-gray-500 text-sm">
+      <div className="text-center text-slate-500 text-sm">
         <p>Edit either field to update the other • All conversions happen instantly</p>
       </div>
     </div>
