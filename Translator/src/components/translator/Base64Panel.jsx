@@ -1,56 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Copy, ArrowDownUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { useBase64 } from '@/hooks/useBase64';
+import { copyToClipboard } from '@/utils/clipboard';
 
 export default function Base64Panel() {
-  const [plainText, setPlainText] = useState('');
-  const [base64Text, setBase64Text] = useState('');
-
-  const encodeText = (text) => {
-    try {
-      if (text.trim() === '') {
-        return '';
-      }
-      return btoa(unescape(encodeURIComponent(text)));
-    } catch (error) {
-      console.error('Encoding error:', error);
-      return 'Error: Invalid input for encoding.';
-    }
-  };
-
-  const decodeText = (text) => {
-    try {
-      if (text.trim() === '') {
-        return '';
-      }
-      return decodeURIComponent(escape(atob(text)));
-    } catch (error) {
-      console.error('Decoding error:', error);
-      return 'Error: Invalid Base64 string.';
-    }
-  };
-
-  useEffect(() => {
-    setBase64Text(encodeText(plainText));
-  }, [plainText]);
-
-  const handleBase64Change = (newBase64) => {
-    setBase64Text(newBase64);
-    setPlainText(decodeText(newBase64));
-  };
-
-  const copyToClipboard = (text) => {
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success('Copied to clipboard!');
-    }).catch((err) => {
-      console.error('Failed to copy:', err);
-      toast.error('Failed to copy to clipboard');
-    });
-  };
+  const { plainText, setPlainText, base64Text, handleBase64Change } = useBase64();
 
   return (
     <div className="space-y-6">
