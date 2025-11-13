@@ -1,8 +1,12 @@
-// LLM Client with multiple providers and local fallback
+// LLM Client with Google Gemini as primary provider and local fallback
 class LLMClient {
   constructor() {
-    // Try multiple free API providers
-    this.providers = [
+    // Google Gemini API configuration (primary provider)
+    this.geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    this.geminiBaseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    
+    // Fallback providers if Gemini is unavailable
+    this.fallbackProviders = [
       {
         name: 'Hugging Face',
         baseUrl: 'https://api-inference.huggingface.co/models',
@@ -14,11 +18,104 @@ class LLMClient {
         model: 'mistralai/Mistral-7B-Instruct-v0.2',
       }
     ];
-    this.currentProviderIndex = 0;
+    this.currentFallbackIndex = 0;
     this.useLocalFallback = false;
   }
 
-  // Local demo translation for when APIs are unavailable
+  // Try Google Gemini API first
+  async tryGemini(prompt) {
+    if (!this.geminiApiKey) {
+      console.warn('Gemini API key not configured. Set VITE_GEMINI_API_KEY in your .env file.');
+      return null;
+    }
+
+    try {
+      const response = await fetch(`${this.geminiBaseUrl}?key=${this.geminiApiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 500,
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gemini API error:', response.status, errorText);
+        return null;
+      }
+
+      const data = await response.json();
+      
+      // Extract text from Gemini response format
+      if (data.candidates && data.candidates.length > 0) {
+        const content = data.candidates[0].content;
+        if (content && content.parts && content.parts.length > 0) {
+          return content.parts[0].text;
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Gemini API error:', error);
+      return null;
+    }
+  }
+
+  // Try fallback API providers
+  async tryFallbackProviders(prompt) {
+    for (let i = 0; i < this.fallbackProviders.length; i++) {
+      const provider = this.fallbackProviders[this.currentFallbackIndex];
+      
+      try {
+        const response = await fetch(`${provider.baseUrl}/${provider.model}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            inputs: prompt,
+            parameters: {
+              max_new_tokens: 500,
+              temperature: 0.7,
+              return_full_text: false
+            }
+          }),
+        });
+
+        if (!response.ok) {
+          console.error(`${provider.name} API error:`, response.status);
+          this.currentFallbackIndex = (this.currentFallbackIndex + 1) % this.fallbackProviders.length;
+          continue;
+        }
+
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          return data[0].generated_text || String(data[0]);
+        }
+        
+        return data.generated_text || data.result || data.text || String(data);
+      } catch (error) {
+        console.error(`${provider.name} error:`, error);
+        this.currentFallbackIndex = (this.currentFallbackIndex + 1) % this.fallbackProviders.length;
+        continue;
+      }
+    }
+    
+    return null;
+  }
+
+  // Local demo translation for when all APIs are unavailable
   localTranslate(prompt) {
     const input = prompt.split('\n\n').pop() || prompt;
     
@@ -79,62 +176,25 @@ class LLMClient {
       InvokeLLM: async ({ prompt }) => {
         // If already using local fallback, use it directly
         if (this.useLocalFallback) {
-          console.log('Using local demo translation (API unavailable)');
+          console.log('Using local demo translation (all APIs unavailable)');
           return this.localTranslate(prompt);
         }
 
-        // Try API providers
-        for (let i = 0; i < this.providers.length; i++) {
-          const provider = this.providers[this.currentProviderIndex];
-          
-          try {
-            const response = await fetch(`${provider.baseUrl}/${provider.model}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ 
-                inputs: prompt,
-                parameters: {
-                  max_new_tokens: 500,
-                  temperature: 0.7,
-                  return_full_text: false
-                }
-              }),
-            });
+        // 1. Try Google Gemini first (primary provider)
+        const geminiResult = await this.tryGemini(prompt);
+        if (geminiResult) {
+          console.log('Using Google Gemini API');
+          return geminiResult;
+        }
 
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error(`${provider.name} API error:`, response.status, errorText);
-              
-              // If model is loading, show helpful message
-              if (response.status === 503) {
-                return 'The AI model is loading. Please try again in a few moments...';
-              }
-              
-              // Try next provider
-              this.currentProviderIndex = (this.currentProviderIndex + 1) % this.providers.length;
-              continue;
-            }
-
-            const data = await response.json();
-            
-            // Handle API response format
-            if (Array.isArray(data) && data.length > 0) {
-              return data[0].generated_text || String(data[0]);
-            }
-            
-            return data.generated_text || data.result || data.text || String(data);
-          } catch (error) {
-            console.error(`${provider.name} error:`, error);
-            
-            // Try next provider
-            this.currentProviderIndex = (this.currentProviderIndex + 1) % this.providers.length;
-            continue;
-          }
+        // 2. Try fallback providers
+        const fallbackResult = await this.tryFallbackProviders(prompt);
+        if (fallbackResult) {
+          console.log('Using fallback API provider');
+          return fallbackResult;
         }
         
-        // All providers failed, switch to local fallback
+        // 3. All providers failed, switch to local fallback
         console.log('All API providers failed, switching to local demo mode');
         this.useLocalFallback = true;
         return this.localTranslate(prompt);
