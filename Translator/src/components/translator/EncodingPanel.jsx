@@ -67,9 +67,22 @@ export default function EncodingPanel({ encodingType, color, name }) {
           return decodeURIComponent(text);
         
         case 'html':
-          const textarea = document.createElement('textarea');
-          textarea.innerHTML = text;
-          return textarea.value;
+          // For HTML entity decoding, we use a safe approach that doesn't execute scripts
+          // Decode &amp; first to avoid double-escaping issues
+          try {
+            // This approach safely decodes common HTML entities without script execution risk
+            // Order matters: decode &amp; last since other entities may contain it
+            return text
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&nbsp;/g, ' ')
+              .replace(/&amp;/g, '&');
+          } catch (error) {
+            console.error('HTML decode error:', error);
+            return 'Error: Invalid HTML entities.';
+          }
         
         case 'hex':
           const hexValues = text.replace(/\s+/g, '').match(/.{1,2}/g) || [];
