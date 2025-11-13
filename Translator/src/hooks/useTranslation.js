@@ -12,7 +12,7 @@ export function useTranslation(mode) {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { currentModel } = useModel();
+  const { currentModel, sentenceLimit } = useModel();
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -27,6 +27,7 @@ export function useTranslation(mode) {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `${mode.prompt}\n\n${inputText}`,
         modelId: currentModel.id,
+        sentenceLimit: sentenceLimit,
       });
 
       setOutputText(result);
