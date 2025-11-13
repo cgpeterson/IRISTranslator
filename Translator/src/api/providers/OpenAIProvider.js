@@ -17,8 +17,16 @@ export class OpenAIProvider extends ILLMProvider {
            this.apiKey.length >= 20;
   }
 
-  async generateContent(prompt, modelId = 'gpt-4o') {
+  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null) {
     try {
+      // Define base system prompt
+      let systemContent = "You are a helpful assistant.";
+      
+      // Append limit instruction if exists
+      if (sentenceLimit && sentenceLimit > 0) {
+        systemContent += ` Answer in exactly ${sentenceLimit} sentence${sentenceLimit === 1 ? '' : 's'}.`;
+      }
+
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
@@ -28,6 +36,10 @@ export class OpenAIProvider extends ILLMProvider {
         body: JSON.stringify({
           model: modelId,
           messages: [
+            {
+              role: 'system',
+              content: systemContent
+            },
             {
               role: 'user',
               content: prompt

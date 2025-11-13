@@ -63,7 +63,7 @@ export class GeminiProvider extends ILLMProvider {
     }
   }
 
-  async generateContent(prompt, modelId = 'gemini-1.5-flash') {
+  async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null) {
     const maxRetries = 3;
     let attempt = 0;
     let lastError = null;
@@ -72,22 +72,35 @@ export class GeminiProvider extends ILLMProvider {
       try {
         const currentUrl = await this.resolveModelUrl(modelId);
 
+        // Construct system instruction
+        let systemInstructionText = "You are a helpful AI assistant.";
+        if (sentenceLimit && sentenceLimit > 0) {
+          systemInstructionText += ` You must strictly limit your response to exactly ${sentenceLimit} sentence${sentenceLimit === 1 ? '' : 's'}. Do not ramble.`;
+        }
+
+        const requestBody = {
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+          }
+        };
+
+        // Always add systemInstruction; append sentence limit to instruction if configured
+        requestBody.systemInstruction = {
+          parts: [{ text: systemInstructionText }]
+        };
+
         const response = await fetch(`${currentUrl}?key=${this.apiKey}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 8192,
-            }
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (response.status === 503) {

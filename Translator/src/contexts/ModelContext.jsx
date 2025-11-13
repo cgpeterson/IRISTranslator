@@ -5,11 +5,16 @@ import { secretManager } from '@/utils/secretManager';
 const ModelContext = createContext(null);
 
 const SELECTED_MODEL_KEY = 'iris_selected_model';
+const SENTENCE_LIMIT_KEY = 'iris_sentence_limit';
 const PROVIDER_KEYS = Object.values(LLM_PROVIDERS);
 
 export function ModelProvider({ children }) {
   const [currentModel, setCurrentModel] = useState(getDefaultModel());
   const [credentialStatuses, setCredentialStatuses] = useState({});
+  const [sentenceLimit, setSentenceLimit] = useState(() => {
+    const saved = localStorage.getItem(SENTENCE_LIMIT_KEY);
+    return saved ? parseInt(saved, 10) : null;
+  });
 
   // Load selected model from localStorage on mount
   useEffect(() => {
@@ -64,6 +69,24 @@ export function ModelProvider({ children }) {
     return credentialStatuses[provider] || false;
   };
 
+  const updateSentenceLimit = (limit) => {
+    // Validate: must be null, 0, or positive integer between 1-99
+    if (limit === null || limit === 0 || limit === '') {
+      setSentenceLimit(null);
+      localStorage.removeItem(SENTENCE_LIMIT_KEY);
+      return true;
+    } else {
+      const numLimit = parseInt(limit, 10);
+      if (!isNaN(numLimit) && numLimit >= 1 && numLimit <= 99) {
+        setSentenceLimit(numLimit);
+        localStorage.setItem(SENTENCE_LIMIT_KEY, numLimit.toString());
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const value = {
     currentModel,
     selectModel,
@@ -71,6 +94,8 @@ export function ModelProvider({ children }) {
     credentialStatuses,
     getConnectionStatus,
     refreshCredentialStatus,
+    sentenceLimit,
+    updateSentenceLimit,
   };
 
   return (
