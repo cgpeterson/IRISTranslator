@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { base44 } from '@/api/base44Client';
+import { useModel } from '@/contexts/ModelContext';
 
 /**
  * Custom hook for AI translation functionality
@@ -11,6 +12,7 @@ export function useTranslation(mode) {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { currentModel } = useModel();
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -24,6 +26,7 @@ export function useTranslation(mode) {
     try {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `${mode.prompt}\n\n${inputText}`,
+        modelId: currentModel.id,
       });
 
       setOutputText(result);

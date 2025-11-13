@@ -2,19 +2,32 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Base64Panel from '../components/translator/Base64Panel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
+import ModelSelector from '../components/translator/ModelSelector';
+import LLMSettingsDialog from '../components/translator/LLMSettingsDialog';
 import { translationModes } from '@/config/translationModes';
 import { categoryInfo } from '@/config/categoryInfo';
 import { useDropdown } from '@/hooks/useDropdown';
+import { useModel } from '@/contexts/ModelContext';
 
 export default function Translator() {
   const [selectedCategory, setSelectedCategory] = useState('encoding');
   const [selectedMode, setSelectedMode] = useState('base64');
+  const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
   const { openDropdown, dropdownRef, toggleDropdown, closeDropdown } = useDropdown();
+  const { refreshCredentialStatus } = useModel();
 
   const handleCategorySelect = (category, modeId) => {
     setSelectedCategory(category);
     setSelectedMode(modeId);
     closeDropdown();
+  };
+
+  const handleNeedCredentials = () => {
+    setShowCredentialsDialog(true);
+  };
+
+  const handleCredentialsSaved = () => {
+    refreshCredentialStatus();
   };
 
   const currentMode = translationModes[selectedCategory]?.find(
@@ -35,50 +48,55 @@ export default function Translator() {
             </p>
           </div>
 
-          {/* Menu Bar */}
-          <nav ref={dropdownRef} className="flex justify-center gap-2 flex-wrap">
-            {Object.entries(translationModes).map(([category, modes]) => (
-              <div key={category} className="relative">
-                <button
-                  onClick={() => toggleDropdown(category)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-slate-700 text-white'
-                      : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/70 hover:text-white'
-                  }`}
-                >
-                  <span className="text-lg">{categoryInfo[category].icon}</span>
-                  <span className="font-medium text-sm md:text-base">
-                    {categoryInfo[category].title}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      openDropdown === category ? 'rotate-180' : ''
+          {/* Menu Bar with Model Selector */}
+          <div className="flex justify-between items-center gap-4">
+            <nav ref={dropdownRef} className="flex justify-center gap-2 flex-wrap flex-1">
+              {Object.entries(translationModes).map(([category, modes]) => (
+                <div key={category} className="relative">
+                  <button
+                    onClick={() => toggleDropdown(category)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                      selectedCategory === category
+                        ? 'bg-slate-700 text-white'
+                        : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/70 hover:text-white'
                     }`}
-                  />
-                </button>
+                  >
+                    <span className="text-lg">{categoryInfo[category].icon}</span>
+                    <span className="font-medium text-sm md:text-base">
+                      {categoryInfo[category].title}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        openDropdown === category ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
 
-                {/* Dropdown Menu */}
-                {openDropdown === category && (
-                  <div className="absolute top-full mt-2 left-0 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] overflow-hidden z-50">
-                    {modes.map((mode) => (
-                      <button
-                        key={mode.id}
-                        onClick={() => handleCategorySelect(category, mode.id)}
-                        className={`w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors ${
-                          selectedMode === mode.id && selectedCategory === category
-                            ? 'bg-slate-700 text-white'
-                            : 'text-slate-300'
-                        }`}
-                      >
-                        <div className="font-medium text-sm">{mode.name}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
+                  {/* Dropdown Menu */}
+                  {openDropdown === category && (
+                    <div className="absolute top-full mt-2 left-0 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] overflow-hidden z-50">
+                      {modes.map((mode) => (
+                        <button
+                          key={mode.id}
+                          onClick={() => handleCategorySelect(category, mode.id)}
+                          className={`w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors ${
+                            selectedMode === mode.id && selectedCategory === category
+                              ? 'bg-slate-700 text-white'
+                              : 'text-slate-300'
+                          }`}
+                        >
+                          <div className="font-medium text-sm">{mode.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+
+            {/* Model Selector */}
+            <ModelSelector onNeedCredentials={handleNeedCredentials} />
+          </div>
         </div>
       </div>
 
@@ -97,6 +115,13 @@ export default function Translator() {
           <p>All translations happen in real-time. No data is stored.</p>
         </div>
       </div>
+
+      {/* Credentials Dialog */}
+      <LLMSettingsDialog
+        open={showCredentialsDialog}
+        onOpenChange={setShowCredentialsDialog}
+        onSaved={handleCredentialsSaved}
+      />
     </div>
   );
 }
