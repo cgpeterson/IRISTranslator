@@ -74,11 +74,15 @@ export function ModelProvider({ children }) {
     if (limit === null || limit === 0 || limit === '') {
       setSentenceLimit(null);
       localStorage.removeItem(SENTENCE_LIMIT_KEY);
+      return true;
     } else {
       const numLimit = parseInt(limit, 10);
       if (!isNaN(numLimit) && numLimit >= 1 && numLimit <= 99) {
         setSentenceLimit(numLimit);
         localStorage.setItem(SENTENCE_LIMIT_KEY, numLimit.toString());
+        return true;
+      } else {
+        return false;
       }
     }
   };

@@ -22,9 +22,10 @@ export default function AITranslatorPanel({ mode }) {
       updateSentenceLimit(null);
     } else {
       const numValue = parseInt(value, 10);
-      if (!isNaN(numValue)) {
+      if (!isNaN(numValue) && numValue >= 1 && numValue <= 99) {
         updateSentenceLimit(numValue);
       }
+      // Invalid values are ignored; HTML5 validation should prevent most cases
     }
   };
 

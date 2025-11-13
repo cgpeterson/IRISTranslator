@@ -90,7 +90,7 @@ export class GeminiProvider extends ILLMProvider {
           }
         };
 
-        // Add systemInstruction if sentence limit is set or use default
+        // Always add systemInstruction; append sentence limit to instruction if configured
         requestBody.systemInstruction = {
           parts: [{ text: systemInstructionText }]
         };
