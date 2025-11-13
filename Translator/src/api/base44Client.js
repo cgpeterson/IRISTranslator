@@ -2,7 +2,7 @@
 class GeminiClient {
   constructor() {
     this.geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-    this.geminiBaseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    this.geminiBaseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
   }
 
   integrations = {
