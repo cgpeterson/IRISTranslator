@@ -69,6 +69,10 @@ export function LLMProvider({ children }) {
   }, []);
 
   // Save settings to localStorage whenever they change
+  // NOTE: API keys are stored in localStorage (clear text) because this is a client-side
+  // application that needs the keys to make API calls directly from the browser.
+  // Users should be aware that API keys stored here are accessible to browser extensions
+  // and anyone with access to the browser's developer tools.
   const saveSettings = (provider, keys) => {
     const settings = {
       provider: provider || selectedProvider,

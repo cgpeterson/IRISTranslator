@@ -94,7 +94,7 @@ export default function LLMSettingsDialog({ open, onOpenChange }) {
         <Alert className="bg-blue-900/20 border-blue-700">
           <AlertCircle className="h-4 w-4 text-blue-400" />
           <AlertDescription className="text-blue-200 text-sm">
-            API keys are stored encrypted and never shared. You'll be charged directly by each provider based on your usage.
+            API keys are stored in your browser's local storage and only used for your translations. They are never sent to any server except the AI provider you select. Anyone with access to your browser can view these keys, so use them only on trusted devices.
           </AlertDescription>
         </Alert>
 
