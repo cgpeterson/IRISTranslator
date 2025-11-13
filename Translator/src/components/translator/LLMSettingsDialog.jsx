@@ -12,16 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { useLLM } from '@/contexts/LLMContext';
 
-export default function LLMSettingsDialog({ open, onOpenChange, onSaved, user }) {
-  const [apiKeys, setApiKeys] = useState({
-    openai_api_key: '',
-    grok_api_key: '',
-    gemini_api_key: '',
-    anthropic_api_key: '',
-  });
+export default function LLMSettingsDialog({ open, onOpenChange }) {
+  const { apiKeys: contextApiKeys, setApiKeys: setContextApiKeys } = useLLM();
+  const [apiKeys, setApiKeys] = useState(contextApiKeys);
   const [showKeys, setShowKeys] = useState({
     openai: false,
     grok: false,
@@ -31,22 +27,16 @@ export default function LLMSettingsDialog({ open, onOpenChange, onSaved, user })
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (user && open) {
-      setApiKeys({
-        openai_api_key: user.openai_api_key || '',
-        grok_api_key: user.grok_api_key || '',
-        gemini_api_key: user.gemini_api_key || '',
-        anthropic_api_key: user.anthropic_api_key || '',
-      });
+    if (open) {
+      setApiKeys(contextApiKeys);
     }
-  }, [user, open]);
+  }, [open, contextApiKeys]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await base44.auth.updateMe(apiKeys);
+      setContextApiKeys(apiKeys);
       toast.success('API keys saved successfully!');
-      onSaved();
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving API keys:', error);

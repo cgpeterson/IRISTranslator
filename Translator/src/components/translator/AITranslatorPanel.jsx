@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { base44 } from '@/api/base44Client';
+import { useLLM } from '@/contexts/LLMContext';
 
 const colorMap = {
   red: 'border-red-500 focus:border-red-500 focus:ring-red-500',
@@ -29,6 +30,7 @@ const buttonColorMap = {
 };
 
 export default function AITranslatorPanel({ mode }) {
+  const { selectedProvider, getApiKeyForProvider } = useLLM();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,8 +45,11 @@ export default function AITranslatorPanel({ mode }) {
     setOutputText('');
 
     try {
+      const apiKey = getApiKeyForProvider(selectedProvider);
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `${mode.prompt}\n\n${inputText}`,
+        provider: selectedProvider,
+        apiKey,
       });
 
       setOutputText(result);

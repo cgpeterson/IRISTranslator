@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import Base64Panel from '../components/translator/Base64Panel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
+import LLMSelector from '../components/translator/LLMSelector';
 
 export default function Translator() {
   const [openCategories, setOpenCategories] = useState({
@@ -135,13 +136,18 @@ export default function Translator() {
       {/* Header */}
       <div className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-6 md:px-6 md:py-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Chat Translator
-            </h1>
-            <p className="text-slate-400 text-sm md:text-base">
-              Transform your text with encoding, literary styles, and regional dialects
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="text-center flex-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                Chat Translator
+              </h1>
+              <p className="text-slate-400 text-sm md:text-base">
+                Transform your text with encoding, literary styles, and regional dialects
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <LLMSelector />
+            </div>
           </div>
         </div>
       </div>
