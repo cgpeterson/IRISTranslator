@@ -119,7 +119,7 @@ See SETUP_GEMINI.md for detailed instructions.`;
                 }],
                 generationConfig: {
                   temperature: 0.7,
-                  maxOutputTokens: 500,
+                  maxOutputTokens: 8192, // Increased from 500 to prevent truncation errors
                 }
               }),
             });
