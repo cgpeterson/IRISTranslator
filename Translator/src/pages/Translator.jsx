@@ -17,6 +17,7 @@ export default function Translator() {
     encoding: true,
     literary: false,
     dialects: false,
+    fantasy: false,
     decode: false,
   });
 
@@ -94,6 +95,53 @@ export default function Translator() {
         placeholder: 'Put it here, hoss...',
       }
     ],
+    fantasy: [
+      {
+        id: 'elven',
+        name: 'Elven',
+        color: 'emerald',
+        prompt: `You are an ancient Elven scholar from the forests of legend. Your speech is elegant, flowing, and poetic, filled with references to nature, starlight, and timeless wisdom. Translate the following text into the lyrical, graceful tongue of the Elves. Use flowery language and mystical references. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate this:`,
+        inputLabel: 'Mortal Speech',
+        outputLabel: 'Elven Verse',
+        placeholder: 'Share your words, child of the sun...',
+      },
+      {
+        id: 'klingon',
+        name: 'Klingon',
+        color: 'red',
+        prompt: `You are a fierce Klingon warrior! Your words are bold, direct, and honorable. You speak of battle, glory, and honor above all else. Translate the following text into the aggressive, commanding style of a Klingon warrior. Be forceful and proud! Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate this:`,
+        inputLabel: 'Weak Words',
+        outputLabel: "Warrior's Tongue",
+        placeholder: 'Speak your challenge, if you dare...',
+      },
+      {
+        id: 'wizard',
+        name: 'Wizard',
+        color: 'violet',
+        prompt: `You are an ancient wizard, master of arcane arts and mystical knowledge. Your speech is cryptic, wise, and filled with magical references. You speak of spells, enchantments, and the weave of magic. Translate the following text into the mysterious, scholarly tongue of a powerful wizard. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate this:`,
+        inputLabel: 'Common Tongue',
+        outputLabel: 'Arcane Speech',
+        placeholder: 'Whisper your query, apprentice...',
+      },
+      {
+        id: 'monk',
+        name: 'Monk',
+        color: 'amber',
+        prompt: `You are a wise monk who has achieved enlightenment through meditation and discipline. Your words are simple, profound, and filled with ancient wisdom. You speak in metaphors and parables, teaching through gentle guidance. Translate the following text into the calm, thoughtful speech of a peaceful monk. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate this:`,
+        inputLabel: 'Worldly Words',
+        outputLabel: 'Path of Wisdom',
+        placeholder: 'Share what troubles you, seeker...',
+      },
+      {
+        id: 'dwarven',
+        name: 'Dwarven',
+        color: 'orange',
+        prompt: `You are a stout Dwarven craftsman from the mountain halls! Your speech is gruff, practical, and filled with references to stone, metal, and craftsmanship. You value hard work, loyalty, and a good ale. Translate the following text into the hearty, no-nonsense tongue of the Dwarves. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate this:`,
+        inputLabel: 'Surface Talk',
+        outputLabel: "Dwarf's Grumble",
+        placeholder: 'Out with it then, lad...',
+      }
+    ],
     decode: [
       {
         id: 'decypher',
@@ -122,6 +170,11 @@ export default function Translator() {
       title: 'Regional Dialects',
       description: 'Pirate, Cowboy, Redneck',
       icon: '🗣️',
+    },
+    fantasy: {
+      title: 'Fantasy',
+      description: 'Elven, Klingon, Wizard, Monk, Dwarven',
+      icon: '🐉',
     },
     decode: {
       title: 'Decode',
