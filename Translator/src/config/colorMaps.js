@@ -11,6 +11,7 @@ export const colorMap = {
   yellow: 'border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500',
   green: 'border-green-500 focus:border-green-500 focus:ring-green-500',
   purple: 'border-purple-500 focus:border-purple-500 focus:ring-purple-500',
+  orange: 'border-orange-500 focus:border-orange-500 focus:ring-orange-500',
 };
 
 export const buttonColorMap = {
@@ -22,4 +23,5 @@ export const buttonColorMap = {
   yellow: 'bg-yellow-600 hover:bg-yellow-700',
   green: 'bg-green-600 hover:bg-green-700',
   purple: 'bg-purple-600 hover:bg-purple-700',
+  orange: 'bg-orange-600 hover:bg-orange-700',
 };

@@ -23,4 +23,9 @@ export const categoryInfo = {
     description: 'Decode any obscured or encoded text',
     icon: '🔓',
   },
+  sports: {
+    title: 'Sports',
+    description: 'Sports commentary styles',
+    icon: '🏆',
+  },
 };
