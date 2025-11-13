@@ -1,6 +1,6 @@
 /**
  * StringEncoder utility class
- * Provides bidirectional encoding/decoding for 5 standard formats
+ * Provides bidirectional encoding/decoding for 3 standard formats
  */
 export class StringEncoder {
   
@@ -22,26 +22,13 @@ export class StringEncoder {
       // Uses TextEncoder to safely handle UTF-8/Emojis
       encode: (str) => {
         return window.btoa(
-          String.fromCharCode(...new TextEncoder().encode(str))
+          String.fromCharCode.apply(null, new TextEncoder().encode(str))
         );
       },
       decode: (str) => {
         return new TextDecoder().decode(
           Uint8Array.from(window.atob(str), c => c.charCodeAt(0))
         );
-      }
-    },
-
-    url: {
-      encode: (str) => encodeURIComponent(str),
-      decode: (str) => decodeURIComponent(str)
-    },
-
-    html: {
-      encode: (str) => str.replace(/[\u00A0-\u9999<>&]/g, i => '&#' + i.charCodeAt(0) + ';'),
-      decode: (str) => {
-        const doc = new DOMParser().parseFromString(str, "text/html");
-        return doc.documentElement.textContent;
       }
     },
 
@@ -55,7 +42,7 @@ export class StringEncoder {
         const hex = str.toString();
         let output = '';
         for (let i = 0; i < hex.length; i += 2) {
-          output += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+          output += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16));
         }
         return output;
       }
