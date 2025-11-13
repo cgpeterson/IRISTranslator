@@ -15,22 +15,20 @@ const colorMap = {
 };
 
 export default function EncodingPanel({ encodingType, color, name }) {
-  const [mode, setMode] = useState('encode');
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [plainText, setPlainText] = useState('');
+  const [encodedText, setEncodedText] = useState('');
 
-  // Handle input text changes
+  // Handle plain text changes - encode it
   useEffect(() => {
-    const result = StringEncoder.process(inputText, encodingType, mode);
-    setOutputText(result);
-  }, [inputText, encodingType, mode]);
+    const result = StringEncoder.process(plainText, encodingType, 'encode');
+    setEncodedText(result);
+  }, [plainText, encodingType]);
 
-  // Handle output text changes (for bidirectional editing)
-  const handleOutputChange = (newOutput) => {
-    setOutputText(newOutput);
-    const reverseMode = mode === 'encode' ? 'decode' : 'encode';
-    const result = StringEncoder.process(newOutput, encodingType, reverseMode);
-    setInputText(result);
+  // Handle encoded text changes - decode it
+  const handleEncodedChange = (newEncoded) => {
+    setEncodedText(newEncoded);
+    const result = StringEncoder.process(newEncoded, encodingType, 'decode');
+    setPlainText(result);
   };
 
   const copyToClipboard = (text) => {
@@ -44,8 +42,6 @@ export default function EncodingPanel({ encodingType, color, name }) {
   };
 
   const borderColor = colorMap[color] || colorMap.blue;
-  const inputLabel = mode === 'encode' ? 'Plain Text' : `${name} Encoded`;
-  const outputLabel = mode === 'encode' ? `${name} Encoded` : 'Plain Text';
 
   return (
     <div className="space-y-6">
@@ -54,54 +50,28 @@ export default function EncodingPanel({ encodingType, color, name }) {
         <p className="text-slate-400 text-sm mt-1">Real-time encoding and decoding</p>
       </div>
 
-      {/* Mode Toggle */}
-      <div className="flex justify-center mb-4">
-        <div className="inline-flex rounded-lg bg-slate-700/50 p-1">
-          <button
-            onClick={() => setMode('encode')}
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-              mode === 'encode'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Encode
-          </button>
-          <button
-            onClick={() => setMode('decode')}
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-              mode === 'decode'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Decode
-          </button>
-        </div>
-      </div>
-
       <div className="grid md:grid-cols-2 gap-6 relative">
-        {/* Input Text */}
+        {/* Plain Text */}
         <div className="space-y-3">
-          <Label htmlFor="input-text" className="text-slate-300 font-medium">
-            {inputLabel}
+          <Label htmlFor="plain-text" className="text-slate-300 font-medium">
+            Plain Text
           </Label>
           <Textarea
-            id="input-text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            id="plain-text"
+            value={plainText}
+            onChange={(e) => setPlainText(e.target.value)}
             rows={8}
             className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none ${borderColor}`}
-            placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter text to decode...'}
+            placeholder="Enter text to encode..."
           />
           <Button
-            onClick={() => copyToClipboard(inputText)}
+            onClick={() => copyToClipboard(plainText)}
             variant="outline"
             className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-            disabled={!inputText.trim()}
+            disabled={!plainText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
-            Copy Input
+            Copy Plain Text
           </Button>
         </div>
 
@@ -112,27 +82,27 @@ export default function EncodingPanel({ encodingType, color, name }) {
           </div>
         </div>
 
-        {/* Output Text */}
+        {/* Encoded Text */}
         <div className="space-y-3">
-          <Label htmlFor="output-text" className="text-slate-300 font-medium">
-            {outputLabel}
+          <Label htmlFor="encoded-text" className="text-slate-300 font-medium">
+            {name} Encoded
           </Label>
           <Textarea
-            id="output-text"
-            value={outputText}
-            onChange={(e) => handleOutputChange(e.target.value)}
+            id="encoded-text"
+            value={encodedText}
+            onChange={(e) => handleEncodedChange(e.target.value)}
             rows={8}
             className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none font-mono text-sm ${borderColor}`}
-            placeholder={mode === 'encode' ? 'Encoded text appears here...' : 'Decoded text appears here...'}
+            placeholder="Encoded text appears here..."
           />
           <Button
-            onClick={() => copyToClipboard(outputText)}
+            onClick={() => copyToClipboard(encodedText)}
             variant="outline"
             className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-            disabled={!outputText.trim()}
+            disabled={!encodedText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
-            Copy Output
+            Copy Encoded
           </Button>
         </div>
       </div>

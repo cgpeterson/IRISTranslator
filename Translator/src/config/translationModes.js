@@ -12,20 +12,6 @@ export const translationModes = {
       encodingType: 'base64',
     },
     {
-      id: 'url',
-      name: 'URL Encoding',
-      color: 'indigo',
-      isEncoding: true,
-      encodingType: 'url',
-    },
-    {
-      id: 'html',
-      name: 'HTML Entities',
-      color: 'violet',
-      isEncoding: true,
-      encodingType: 'html',
-    },
-    {
       id: 'hex',
       name: 'Hexadecimal',
       color: 'sky',
