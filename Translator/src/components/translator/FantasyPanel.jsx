@@ -3,7 +3,7 @@ import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useFantasyTranslation } from '@/hooks/useFantasyTranslation';
 import { copyToClipboard } from '@/utils/clipboard';
 import { colorMap, buttonColorMap } from '@/config/colorMaps';
 import { FANTASY_PERSONAS } from '@/data/fantasyPrompts';
@@ -11,13 +11,8 @@ import { FANTASY_PERSONAS } from '@/data/fantasyPrompts';
 export default function FantasyPanel({ mode }) {
   const [selectedPersona, setSelectedPersona] = useState('elven');
   
-  // Create a modified mode object with the persona's system prompt
-  const personaMode = {
-    ...mode,
-    prompt: FANTASY_PERSONAS[selectedPersona].systemPrompt + "\n\nTranslate this:"
-  };
-  
-  const { inputText, setInputText, outputText, isLoading, handleTranslate } = useTranslation(personaMode);
+  const { inputText, setInputText, outputText, isLoading, handleTranslate } = 
+    useFantasyTranslation(FANTASY_PERSONAS[selectedPersona].systemPrompt);
 
   const borderColor = colorMap[mode.color] || colorMap.purple;
   const buttonColor = buttonColorMap[mode.color] || buttonColorMap.purple;

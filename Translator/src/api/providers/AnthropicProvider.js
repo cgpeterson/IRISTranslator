@@ -15,12 +15,19 @@ export class AnthropicProvider extends ILLMProvider {
     return typeof this.apiKey === 'string' && anthropicKeyRegex.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'claude-3-5-sonnet-20241022', sentenceLimit = null) {
+  async generateContent(prompt, modelId = 'claude-3-5-sonnet-20241022', sentenceLimit = null, systemInstruction = null) {
     try {
-      // Construct the user message, prepending sentence limit instruction if needed
+      // Construct the user message
       let userMessage = prompt;
+      
+      // Prepend custom system instruction if provided
+      if (systemInstruction) {
+        userMessage = `${systemInstruction}\n\n${prompt}`;
+      }
+      
+      // Add sentence limit instruction if needed
       if (sentenceLimit && sentenceLimit > 0) {
-        userMessage = `Please limit your response to exactly ${sentenceLimit} sentence${sentenceLimit === 1 ? '' : 's'}.\n\n${prompt}`;
+        userMessage = `Please limit your response to exactly ${sentenceLimit} sentence${sentenceLimit === 1 ? '' : 's'}.\n\n${userMessage}`;
       }
 
       const response = await fetch(this.baseUrl, {

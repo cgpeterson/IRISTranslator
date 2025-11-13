@@ -63,7 +63,7 @@ export class GeminiProvider extends ILLMProvider {
     }
   }
 
-  async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null) {
+  async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null, systemInstruction = null) {
     const maxRetries = 3;
     let attempt = 0;
     let lastError = null;
@@ -73,7 +73,7 @@ export class GeminiProvider extends ILLMProvider {
         const currentUrl = await this.resolveModelUrl(modelId);
 
         // Construct system instruction
-        let systemInstructionText = "You are a helpful AI assistant.";
+        let systemInstructionText = systemInstruction || "You are a helpful AI assistant.";
         if (sentenceLimit && sentenceLimit > 0) {
           systemInstructionText += ` You must strictly limit your response to exactly ${sentenceLimit} sentence${sentenceLimit === 1 ? '' : 's'}. Do not ramble.`;
         }

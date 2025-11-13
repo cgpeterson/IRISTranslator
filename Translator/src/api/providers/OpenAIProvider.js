@@ -17,10 +17,10 @@ export class OpenAIProvider extends ILLMProvider {
            this.apiKey.length >= 20;
   }
 
-  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null) {
+  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null, systemInstruction = null) {
     try {
       // Define base system prompt
-      let systemContent = "You are a helpful assistant.";
+      let systemContent = systemInstruction || "You are a helpful assistant.";
       
       // Append limit instruction if exists
       if (sentenceLimit && sentenceLimit > 0) {
