@@ -6,9 +6,24 @@ export const translationModes = {
   encoding: [
     {
       id: 'base64',
-      name: 'Base64 Encoder/Decoder',
+      name: 'Base64',
       color: 'blue',
-      isBase64: true,
+      isEncoding: true,
+      encodingType: 'base64',
+    },
+    {
+      id: 'hex',
+      name: 'Hexadecimal',
+      color: 'sky',
+      isEncoding: true,
+      encodingType: 'hex',
+    },
+    {
+      id: 'binary',
+      name: 'Binary',
+      color: 'emerald',
+      isEncoding: true,
+      encodingType: 'binary',
     }
   ],
   literary: [
