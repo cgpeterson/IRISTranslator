@@ -11,8 +11,11 @@ export function useBase64() {
 
   // Automatically encode when plain text changes
   useEffect(() => {
-    setBase64Text(encodeBase64(plainText));
-  }, [plainText]);
+    const encoded = encodeBase64(plainText);
+    if (encoded !== base64Text) {
+      setBase64Text(encoded);
+    }
+  }, [plainText, base64Text]);
 
   // Handle Base64 text changes (decode to plain text)
   const handleBase64Change = (newBase64) => {
