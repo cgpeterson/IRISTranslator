@@ -23,6 +23,11 @@ export const categoryInfo = {
     description: 'Decode any obscured or encoded text',
     icon: '🔓',
   },
+  fantasy: {
+    title: 'Fantasy',
+    description: 'RPG persona-based style transfers',
+    icon: '⚔️',
+  },
   sports: {
     title: 'Sports',
     description: 'Sports commentary styles',

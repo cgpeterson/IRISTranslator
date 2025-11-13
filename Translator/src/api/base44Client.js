@@ -77,7 +77,7 @@ class GeminiClient {
 
   integrations = {
     Core: {
-      InvokeLLM: async ({ prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null }) => {
+      InvokeLLM: async ({ prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null, systemInstruction = null }) => {
         try {
           // Get the model configuration
           const model = LLM_MODELS[modelId];
@@ -127,7 +127,7 @@ See SETUP_GEMINI.md for detailed instructions.`;
 
           // Create provider instance and generate content
           const provider = ProviderFactory.createProvider(model.provider, apiKey);
-          const result = await provider.generateContent(prompt, modelId, sentenceLimit);
+          const result = await provider.generateContent(prompt, modelId, sentenceLimit, systemInstruction);
           return result;
 
         } catch (error) {

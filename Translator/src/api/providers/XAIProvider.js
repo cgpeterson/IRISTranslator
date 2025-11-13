@@ -15,10 +15,10 @@ export class XAIProvider extends ILLMProvider {
     return typeof this.apiKey === 'string' && xaiKeyPattern.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'grok-beta', sentenceLimit = null) {
+  async generateContent(prompt, modelId = 'grok-beta', sentenceLimit = null, systemInstruction = null) {
     try {
       // Define base system prompt
-      let systemContent = "You are a helpful assistant.";
+      let systemContent = systemInstruction || "You are a helpful assistant.";
       
       // Append limit instruction if exists
       if (sentenceLimit && sentenceLimit > 0) {

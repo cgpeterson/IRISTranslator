@@ -12,9 +12,10 @@ export class ILLMProvider {
    * @param {string} prompt - The prompt to send to the LLM
    * @param {string} modelId - The specific model ID to use for generation
    * @param {number|null} sentenceLimit - Optional maximum number of sentences for the response (1-99)
+   * @param {string|null} systemInstruction - Optional system instruction to guide the model's behavior
    * @returns {Promise<string>} - The generated text
    */
-  async generateContent(prompt, modelId, sentenceLimit = null) {
+  async generateContent(prompt, modelId, sentenceLimit = null, systemInstruction = null) {
     throw new Error('generateContent() must be implemented by subclass');
   }
 
