@@ -152,6 +152,8 @@ export const translationModes = {
       inputLabel: 'Plain English',
       outputLabel: 'Bardic Performance',
       placeholder: 'Share your tale...',
+    }
+  ],
   sports: [
     {
       id: 'hype_man',

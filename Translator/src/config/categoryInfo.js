@@ -27,6 +27,7 @@ export const categoryInfo = {
     title: 'Fantasy',
     description: 'RPG persona-based style transfers',
     icon: '⚔️',
+  },
   sports: {
     title: 'Sports',
     description: 'Sports commentary styles',
