@@ -79,5 +79,16 @@ export const translationModes = {
       outputLabel: 'Clear Modern English',
       placeholder: 'Paste Base64, Pirate, Shakespearian, etc...',
     }
+  ],
+  fantasy: [
+    {
+      id: 'fantasy',
+      name: 'Fantasy Personas',
+      color: 'purple',
+      isFantasy: true,
+      inputLabel: 'Plain English',
+      outputLabel: 'Roleplay Speech',
+      placeholder: 'Enter text to transform...',
+    }
   ]
 };

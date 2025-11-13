@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Base64Panel from '../components/translator/Base64Panel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
+import FantasyPanel from '../components/translator/FantasyPanel';
 import ModelSelector from '../components/translator/ModelSelector';
 import LLMSettingsDialog from '../components/translator/LLMSettingsDialog';
 import { translationModes } from '@/config/translationModes';
@@ -105,6 +106,8 @@ export default function Translator() {
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 p-6">
           {currentMode?.isBase64 ? (
             <Base64Panel />
+          ) : currentMode?.isFantasy ? (
+            <FantasyPanel mode={currentMode} />
           ) : (
             currentMode && <AITranslatorPanel mode={currentMode} />
           )}
