@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { StringEncoder } from '@/utils/StringEncoder';
 
 const colorMap = {
   blue: 'border-blue-500 focus:border-blue-500 focus:ring-blue-500',
@@ -14,104 +15,22 @@ const colorMap = {
 };
 
 export default function EncodingPanel({ encodingType, color, name }) {
-  const [plainText, setPlainText] = useState('');
-  const [encodedText, setEncodedText] = useState('');
+  const [mode, setMode] = useState('encode');
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
 
-  const encodeText = (text, type) => {
-    try {
-      if (text.trim() === '') return '';
-
-      switch (type) {
-        case 'base64':
-          return btoa(unescape(encodeURIComponent(text)));
-        
-        case 'url':
-          return encodeURIComponent(text);
-        
-        case 'html':
-          return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-        
-        case 'hex':
-          return Array.from(text)
-            .map(char => char.charCodeAt(0).toString(16).padStart(2, '0'))
-            .join(' ');
-        
-        case 'binary':
-          return Array.from(text)
-            .map(char => char.charCodeAt(0).toString(2).padStart(8, '0'))
-            .join(' ');
-        
-        default:
-          return text;
-      }
-    } catch (error) {
-      console.error('Encoding error:', error);
-      return 'Error: Invalid input for encoding.';
-    }
-  };
-
-  const decodeText = (text, type) => {
-    try {
-      if (text.trim() === '') return '';
-
-      switch (type) {
-        case 'base64':
-          return decodeURIComponent(escape(atob(text)));
-        
-        case 'url':
-          return decodeURIComponent(text);
-        
-        case 'html':
-          // For HTML entity decoding, we use a safe approach that doesn't execute scripts
-          // Decode &amp; first to avoid double-escaping issues
-          try {
-            // This approach safely decodes common HTML entities without script execution risk
-            // Order matters: decode &amp; last since other entities may contain it
-            return text
-              .replace(/&lt;/g, '<')
-              .replace(/&gt;/g, '>')
-              .replace(/&quot;/g, '"')
-              .replace(/&#039;/g, "'")
-              .replace(/&nbsp;/g, ' ')
-              .replace(/&amp;/g, '&');
-          } catch (error) {
-            console.error('HTML decode error:', error);
-            return 'Error: Invalid HTML entities.';
-          }
-        
-        case 'hex':
-          const hexValues = text.replace(/\s+/g, '').match(/.{1,2}/g) || [];
-          return hexValues
-            .map(hex => String.fromCharCode(parseInt(hex, 16)))
-            .join('');
-        
-        case 'binary':
-          const binaryValues = text.split(/\s+/).filter(b => b);
-          return binaryValues
-            .map(bin => String.fromCharCode(parseInt(bin, 2)))
-            .join('');
-        
-        default:
-          return text;
-      }
-    } catch (error) {
-      console.error('Decoding error:', error);
-      return 'Error: Invalid encoded string.';
-    }
-  };
-
+  // Handle input text changes
   useEffect(() => {
-    setEncodedText(encodeText(plainText, encodingType));
-  }, [plainText, encodingType]);
+    const result = StringEncoder.process(inputText, encodingType, mode);
+    setOutputText(result);
+  }, [inputText, encodingType, mode]);
 
-  const handleEncodedChange = (newEncoded) => {
-    setEncodedText(newEncoded);
-    setPlainText(decodeText(newEncoded, encodingType));
+  // Handle output text changes (for bidirectional editing)
+  const handleOutputChange = (newOutput) => {
+    setOutputText(newOutput);
+    const reverseMode = mode === 'encode' ? 'decode' : 'encode';
+    const result = StringEncoder.process(newOutput, encodingType, reverseMode);
+    setInputText(result);
   };
 
   const copyToClipboard = (text) => {
@@ -125,72 +44,100 @@ export default function EncodingPanel({ encodingType, color, name }) {
   };
 
   const borderColor = colorMap[color] || colorMap.blue;
+  const inputLabel = mode === 'encode' ? 'Plain Text' : `${name} Encoded`;
+  const outputLabel = mode === 'encode' ? `${name} Encoded` : 'Plain Text';
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">{name}</h2>
-        <p className="text-gray-400 text-sm mt-1">Real-time encoding and decoding</p>
+        <p className="text-slate-400 text-sm mt-1">Real-time encoding and decoding</p>
+      </div>
+
+      {/* Mode Toggle */}
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex rounded-lg bg-slate-700/50 p-1">
+          <button
+            onClick={() => setMode('encode')}
+            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              mode === 'encode'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            Encode
+          </button>
+          <button
+            onClick={() => setMode('decode')}
+            className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              mode === 'decode'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            Decode
+          </button>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 relative">
-        {/* Plain Text */}
+        {/* Input Text */}
         <div className="space-y-3">
-          <Label htmlFor="plain-text" className="text-gray-300 font-medium">
-            Plain Text
+          <Label htmlFor="input-text" className="text-slate-300 font-medium">
+            {inputLabel}
           </Label>
           <Textarea
-            id="plain-text"
-            value={plainText}
-            onChange={(e) => setPlainText(e.target.value)}
+            id="input-text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
             rows={8}
-            className={`bg-gray-700 border-gray-600 text-white placeholder-gray-400 resize-none ${borderColor}`}
-            placeholder="Enter text to encode..."
+            className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none ${borderColor}`}
+            placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter text to decode...'}
           />
           <Button
-            onClick={() => copyToClipboard(plainText)}
+            onClick={() => copyToClipboard(inputText)}
             variant="outline"
-            className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-            disabled={!plainText.trim()}
+            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+            disabled={!inputText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
-            Copy Plain Text
+            Copy Input
           </Button>
         </div>
 
         {/* Arrow indicator */}
         <div className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-          <div className={`bg-${color}-600 p-3 rounded-full shadow-lg`}>
+          <div className={`bg-blue-600 p-3 rounded-full shadow-lg`}>
             <ArrowDownUp className="w-5 h-5 text-white" />
           </div>
         </div>
 
-        {/* Encoded Text */}
+        {/* Output Text */}
         <div className="space-y-3">
-          <Label htmlFor="encoded-text" className="text-gray-300 font-medium">
-            {name} Encoded
+          <Label htmlFor="output-text" className="text-slate-300 font-medium">
+            {outputLabel}
           </Label>
           <Textarea
-            id="encoded-text"
-            value={encodedText}
-            onChange={(e) => handleEncodedChange(e.target.value)}
+            id="output-text"
+            value={outputText}
+            onChange={(e) => handleOutputChange(e.target.value)}
             rows={8}
-            className={`bg-gray-700 border-gray-600 text-white placeholder-gray-400 resize-none font-mono text-sm ${borderColor}`}
-            placeholder="Encoded text appears here..."
+            className={`bg-slate-900/50 border-slate-600 text-white placeholder-slate-500 resize-none font-mono text-sm ${borderColor}`}
+            placeholder={mode === 'encode' ? 'Encoded text appears here...' : 'Decoded text appears here...'}
           />
           <Button
-            onClick={() => copyToClipboard(encodedText)}
+            onClick={() => copyToClipboard(outputText)}
             variant="outline"
-            className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
-            disabled={!encodedText.trim()}
+            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+            disabled={!outputText.trim()}
           >
             <Copy className="w-4 h-4 mr-2" />
-            Copy Encoded
+            Copy Output
           </Button>
         </div>
       </div>
 
-      <div className="text-center text-gray-500 text-sm">
+      <div className="text-center text-slate-500 text-sm">
         <p>Edit either field to update the other • All conversions happen instantly</p>
       </div>
     </div>
