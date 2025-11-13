@@ -1,71 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { base44 } from '@/api/base44Client';
-
-const colorMap = {
-  red: 'border-red-500 focus:border-red-500 focus:ring-red-500',
-  blue: 'border-blue-500 focus:border-blue-500 focus:ring-blue-500',
-  teal: 'border-teal-500 focus:border-teal-500 focus:ring-teal-500',
-  cyan: 'border-cyan-500 focus:border-cyan-500 focus:ring-cyan-500',
-  slate: 'border-slate-500 focus:border-slate-500 focus:ring-slate-500',
-  yellow: 'border-yellow-500 focus:border-yellow-500 focus:ring-yellow-500',
-  green: 'border-green-500 focus:border-green-500 focus:ring-green-500',
-  purple: 'border-purple-500 focus:border-purple-500 focus:ring-purple-500',
-};
-
-const buttonColorMap = {
-  red: 'bg-red-600 hover:bg-red-700',
-  blue: 'bg-blue-600 hover:bg-blue-700',
-  teal: 'bg-teal-600 hover:bg-teal-700',
-  cyan: 'bg-cyan-600 hover:bg-cyan-700',
-  slate: 'bg-slate-600 hover:bg-slate-700',
-  yellow: 'bg-yellow-600 hover:bg-yellow-700',
-  green: 'bg-green-600 hover:bg-green-700',
-  purple: 'bg-purple-600 hover:bg-purple-700',
-};
+import { useTranslation } from '@/hooks/useTranslation';
+import { copyToClipboard } from '@/utils/clipboard';
+import { colorMap, buttonColorMap } from '@/config/colorMaps';
 
 export default function AITranslatorPanel({ mode }) {
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleTranslate = async () => {
-    if (!inputText.trim()) {
-      toast.error('Please enter some text to translate');
-      return;
-    }
-
-    setIsLoading(true);
-    setOutputText('');
-
-    try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `${mode.prompt}\n\n${inputText}`,
-      });
-
-      setOutputText(result);
-    } catch (error) {
-      console.error('Translation error:', error);
-      toast.error('Failed to translate. Please try again.');
-      setOutputText('Error: Could not connect to translation service.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const copyToClipboard = (text) => {
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success('Copied to clipboard!');
-    }).catch((err) => {
-      console.error('Failed to copy:', err);
-      toast.error('Failed to copy to clipboard');
-    });
-  };
+  const { inputText, setInputText, outputText, isLoading, handleTranslate } = useTranslation(mode);
 
   const borderColor = colorMap[mode.color] || colorMap.blue;
   const buttonColor = buttonColorMap[mode.color] || buttonColorMap.blue;
