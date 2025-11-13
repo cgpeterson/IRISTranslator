@@ -1,8 +1,69 @@
-// Google Gemini LLM Client (No Fallbacks)
+// Google Gemini LLM Client (Dynamic Version Resolution)
 class GeminiClient {
   constructor() {
     this.geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-    this.geminiBaseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    this.cachedBaseUrl = null; // Store the URL here after we find it once
+  }
+
+  // Helper to find the best available model
+  async resolveModelUrl() {
+    // 1. Return cached URL if we already found it
+    if (this.cachedBaseUrl) return this.cachedBaseUrl;
+
+    try {
+      // 2. Ask Google what models are available
+      const listResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${this.geminiApiKey}`
+      );
+      
+      if (!listResponse.ok) {
+        throw new Error('Failed to list models');
+      }
+
+      const data = await listResponse.json();
+      const models = data.models || [];
+
+      // 3. Find the newest "Flash" model that supports content generation
+      // We look for models containing "flash" and supporting "generateContent"
+      const flashModels = models.filter(m => 
+        m.name.toLowerCase().includes('flash') && 
+        m.supportedGenerationMethods && 
+        m.supportedGenerationMethods.includes('generateContent')
+      );
+
+      // Sort by version number (descending) so we get the highest number (e.g., 2.5 > 1.5)
+      flashModels.sort((a, b) => {
+        // Extract version numbers from model names like "models/gemini-1.5-flash"
+        const versionRegex = /(\d+\.?\d*)/g;
+        const versionsA = a.name.match(versionRegex);
+        const versionsB = b.name.match(versionRegex);
+        
+        const versionA = versionsA ? parseFloat(versionsA[0]) : 0;
+        const versionB = versionsB ? parseFloat(versionsB[0]) : 0;
+        
+        return versionB - versionA;
+      });
+
+      // Default fallback if no flash model is found
+      let selectedModel = 'models/gemini-1.5-flash'; 
+      
+      if (flashModels.length > 0) {
+        selectedModel = flashModels[0].name;
+        console.log(`Dynamically selected model: ${selectedModel}`);
+      } else {
+        console.warn('No Flash model found, using default: gemini-1.5-flash');
+      }
+
+      // 4. Construct and cache the URL
+      this.cachedBaseUrl = `https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent`;
+      return this.cachedBaseUrl;
+
+    } catch (error) {
+      console.warn('Model resolution failed, falling back to hardcoded default.', error);
+      // Fallback to a safe default if the List request fails
+      this.cachedBaseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+      return this.cachedBaseUrl;
+    }
   }
 
   integrations = {
@@ -31,7 +92,10 @@ See SETUP_GEMINI.md for detailed instructions.`;
         }
 
         try {
-          const response = await fetch(`${this.geminiBaseUrl}?key=${this.geminiApiKey}`, {
+          // Await the dynamic URL resolution
+          const currentUrl = await this.resolveModelUrl();
+
+          const response = await fetch(`${currentUrl}?key=${this.geminiApiKey}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
