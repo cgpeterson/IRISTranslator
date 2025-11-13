@@ -11,6 +11,11 @@ export async function copyToClipboard(text, successMessage = 'Copied to clipboar
     return false;
   }
 
+  if (!navigator.clipboard) {
+    toast.error('Clipboard not available');
+    return false;
+  }
+
   try {
     await navigator.clipboard.writeText(text);
     toast.success(successMessage);

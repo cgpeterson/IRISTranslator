@@ -8,7 +8,8 @@ export function encodeBase64(text) {
     if (!text || text.trim() === '') {
       return '';
     }
-    return btoa(unescape(encodeURIComponent(text)));
+    // Use TextEncoder for proper UTF-8 handling (replaces deprecated unescape)
+    return btoa(String.fromCharCode(...new TextEncoder().encode(text)));
   } catch (error) {
     console.error('Encoding error:', error);
     return 'Error: Invalid input for encoding.';
@@ -25,7 +26,8 @@ export function decodeBase64(text) {
     if (!text || text.trim() === '') {
       return '';
     }
-    return decodeURIComponent(escape(atob(text)));
+    // Use TextDecoder for proper UTF-8 handling (replaces deprecated escape)
+    return new TextDecoder().decode(Uint8Array.from(atob(text), c => c.charCodeAt(0)));
   } catch (error) {
     console.error('Decoding error:', error);
     return 'Error: Invalid Base64 string.';

@@ -1,39 +1,59 @@
-// Base44 API Client for LLM Integration
-class Base44Client {
+// Free LLM API Client using Hugging Face Inference API
+class FreeLLMClient {
   constructor() {
-    this.baseUrl = import.meta.env.VITE_BASE44_API_URL || 'https://api.base44.com';
-    this.apiKey = import.meta.env.VITE_BASE44_API_KEY;
+    // Using Hugging Face's free Inference API
+    this.baseUrl = 'https://api-inference.huggingface.co/models';
+    // Using a free, fast model that doesn't require authentication
+    this.model = 'mistralai/Mistral-7B-Instruct-v0.2';
   }
 
   integrations = {
     Core: {
       InvokeLLM: async ({ prompt }) => {
         try {
-          // If no API key is configured, return a helpful error message
-          if (!this.apiKey) {
-            console.warn('Base44 API key not configured. Set VITE_BASE44_API_KEY in your environment variables.');
-            return 'Error: API key not configured. Please set VITE_BASE44_API_KEY in your environment variables.';
-          }
-
-          const response = await fetch(`${this.baseUrl}/integrations/core/invoke-llm`, {
+          const response = await fetch(`${this.baseUrl}/${this.model}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${this.apiKey}`,
             },
-            body: JSON.stringify({ prompt }),
+            body: JSON.stringify({ 
+              inputs: prompt,
+              parameters: {
+                max_new_tokens: 500,
+                temperature: 0.7,
+                return_full_text: false
+              }
+            }),
           });
 
           if (!response.ok) {
             const errorText = await response.text();
             console.error('LLM API error:', response.status, errorText);
+            
+            // If model is loading, show helpful message
+            if (response.status === 503) {
+              return 'The AI model is loading. Please try again in a few moments...';
+            }
+            
             throw new Error(`API request failed: ${response.status}`);
           }
 
           const data = await response.json();
-          return data.result || data.text || data.response || String(data);
+          
+          // Handle Hugging Face response format
+          if (Array.isArray(data) && data.length > 0) {
+            return data[0].generated_text || String(data[0]);
+          }
+          
+          return data.generated_text || data.result || data.text || String(data);
         } catch (error) {
           console.error('InvokeLLM error:', error);
+          
+          // Provide fallback for network errors
+          if (error.message.includes('Failed to fetch')) {
+            return 'Unable to connect to translation service. Please check your internet connection.';
+          }
+          
           throw error;
         }
       },
@@ -41,4 +61,4 @@ class Base44Client {
   };
 }
 
-export const base44 = new Base44Client();
+export const base44 = new FreeLLMClient();
