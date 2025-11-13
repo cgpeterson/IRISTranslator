@@ -10,8 +10,11 @@ export class OpenAIProvider extends ILLMProvider {
   }
 
   validateApiKey() {
-    // OpenAI keys typically start with "sk-"
-    return this.apiKey && this.apiKey.startsWith('sk-');
+    // OpenAI keys must match pattern: sk-[A-Za-z0-9]{48} or newer format
+    // Note: OpenAI has updated key formats, so we check for minimum length after prefix
+    return typeof this.apiKey === 'string' && 
+           this.apiKey.startsWith('sk-') && 
+           this.apiKey.length >= 20;
   }
 
   async generateContent(prompt, modelId = 'gpt-4o') {
@@ -44,9 +47,13 @@ export class OpenAIProvider extends ILLMProvider {
           errorData = { message: errorText };
         }
 
-        throw new Error(
-          `OpenAI API error (${response.status}): ${errorData.error?.message || errorData.message || 'Unknown error'}`
-        );
+        // Log detailed error for debugging
+        console.error('OpenAI API error details:', {
+          status: response.status,
+          error: errorData.error?.message || errorData.message || errorData
+        });
+
+        throw new Error('OpenAI API request failed. Please check your API key and try again.');
       }
 
       const data = await response.json();

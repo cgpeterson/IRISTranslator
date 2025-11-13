@@ -10,8 +10,9 @@ export class XAIProvider extends ILLMProvider {
   }
 
   validateApiKey() {
-    // xAI keys typically start with "xai-"
-    return this.apiKey && this.apiKey.startsWith('xai-');
+    // xAI keys typically start with "xai-" followed by at least 32 alphanumeric characters
+    const xaiKeyPattern = /^xai-[a-zA-Z0-9]{32,}$/;
+    return typeof this.apiKey === 'string' && xaiKeyPattern.test(this.apiKey);
   }
 
   async generateContent(prompt, modelId = 'grok-beta') {
@@ -44,9 +45,13 @@ export class XAIProvider extends ILLMProvider {
           errorData = { message: errorText };
         }
 
-        throw new Error(
-          `xAI API error (${response.status}): ${errorData.error?.message || errorData.message || 'Unknown error'}`
-        );
+        // Log detailed error for debugging
+        console.error('xAI API error details:', {
+          status: response.status,
+          error: errorData.error?.message || errorData.message || errorData
+        });
+
+        throw new Error('xAI API request failed. Please check your API key and try again.');
       }
 
       const data = await response.json();

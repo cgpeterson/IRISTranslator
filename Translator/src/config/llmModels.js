@@ -59,8 +59,8 @@ export const LLM_MODELS = {
   },
 
   // Premium Models - Anthropic
-  'claude-3.5-sonnet': {
-    id: 'claude-3.5-sonnet',
+  'claude-3-5-sonnet-20241022': {
+    id: 'claude-3-5-sonnet-20241022',
     name: 'Claude 3.5 Sonnet',
     provider: LLM_PROVIDERS.ANTHROPIC,
     tier: MODEL_TIERS.PREMIUM,

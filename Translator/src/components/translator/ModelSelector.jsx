@@ -57,6 +57,7 @@ export default function ModelSelector({ onNeedCredentials }) {
           <div 
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
           
           {/* Dropdown Menu */}

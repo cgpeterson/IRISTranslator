@@ -1,6 +1,19 @@
 /**
  * SecretManager - Handles encryption/decryption of API keys using SubtleCrypto
  * Stores encrypted credentials in localStorage
+ * 
+ * SECURITY NOTE: This implementation uses a hardcoded password combined with a random salt
+ * for key derivation. This provides obfuscation and protection against casual access, but
+ * is not secure against determined attackers with repository access. The encryption primarily
+ * protects against:
+ * - Casual browser inspection of localStorage
+ * - Accidental exposure in screenshots or logs
+ * - Basic XSS attacks that read localStorage
+ * 
+ * For production use cases requiring stronger security, consider:
+ * - Requiring users to set a master password on first use
+ * - Using browser-specific entropy for key derivation
+ * - Implementing a backend service to manage credentials
  */
 
 const STORAGE_PREFIX = 'iris_encrypted_';
@@ -77,7 +90,7 @@ class SecretManager {
       // Convert to base64 for storage
       return btoa(String.fromCharCode(...combined));
     } catch (error) {
-      console.error('Encryption failed:', error);
+      console.error('Encryption failed:', error?.name || 'Unknown error');
       return null;
     }
   }
@@ -106,7 +119,7 @@ class SecretManager {
 
       return this.decoder.decode(decrypted);
     } catch (error) {
-      console.error('Decryption failed:', error);
+      console.error('Decryption failed:', error?.name || 'Unknown error');
       return null;
     }
   }

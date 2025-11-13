@@ -10,8 +10,9 @@ export class GeminiProvider extends ILLMProvider {
   }
 
   validateApiKey() {
-    // Gemini keys typically start with "AIza"
-    return this.apiKey && this.apiKey.startsWith('AIza');
+    // Gemini keys typically start with "AIza" and are 39 characters long, alphanumeric + - and _
+    const apiKeyPattern = /^AIza[0-9A-Za-z-_]{35}$/;
+    return typeof this.apiKey === 'string' && apiKeyPattern.test(this.apiKey);
   }
 
   delay(ms) {
@@ -96,6 +97,25 @@ export class GeminiProvider extends ILLMProvider {
           continue;
         }
 
+        // Break retry loop immediately for 4xx client errors (won't be fixed by retrying)
+        if (response.status >= 400 && response.status < 500) {
+          const errorText = await response.text();
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { message: errorText };
+          }
+
+          // Log detailed error for debugging
+          console.error('Gemini API client error:', {
+            status: response.status,
+            error: errorData.error?.message || errorData.message || errorData
+          });
+
+          throw new Error('Gemini API request failed. Please check your API key and try again.');
+        }
+
         if (!response.ok) {
           const errorText = await response.text();
           let errorData;
@@ -105,9 +125,13 @@ export class GeminiProvider extends ILLMProvider {
             errorData = { message: errorText };
           }
 
-          throw new Error(
-            `Gemini API error (${response.status}): ${errorData.error?.message || errorData.message || 'Unknown error'}`
-          );
+          // Log detailed error for debugging
+          console.error('Gemini API error details:', {
+            status: response.status,
+            error: errorData.error?.message || errorData.message || errorData
+          });
+
+          throw new Error('Gemini API request failed. Please try again later.');
         }
 
         const data = await response.json();

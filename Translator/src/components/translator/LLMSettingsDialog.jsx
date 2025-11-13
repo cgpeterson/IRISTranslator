@@ -33,6 +33,8 @@ export default function LLMSettingsDialog({ open, onOpenChange, onSaved }) {
 
   // Load existing keys when dialog opens
   useEffect(() => {
+    let isMounted = true;
+    
     if (open) {
       const loadKeys = async () => {
         const keys = {};
@@ -40,23 +42,48 @@ export default function LLMSettingsDialog({ open, onOpenChange, onSaved }) {
           const key = await secretManager.getApiKey(provider);
           keys[provider] = key || '';
         }
-        setApiKeys(keys);
+        if (isMounted) {
+          setApiKeys(keys);
+        }
       };
       loadKeys();
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [open]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Save each API key using SecretManager
+      // Validate and save each API key using SecretManager
       for (const [provider, key] of Object.entries(apiKeys)) {
-        await secretManager.setApiKey(provider, key);
+        const trimmedKey = key.trim();
+        
+        // Skip empty keys
+        if (trimmedKey.length === 0) {
+          await secretManager.setApiKey(provider, '');
+          continue;
+        }
+        
+        // Validate non-empty keys have minimum length
+        if (trimmedKey.length < 10) {
+          toast.error(`API key for ${PROVIDER_INFO[provider]?.name || provider} is too short or invalid.`);
+          setIsSaving(false);
+          return;
+        }
+        
+        await secretManager.setApiKey(provider, trimmedKey);
       }
       
       toast.success('API keys saved successfully!');
       if (onSaved) {
-        onSaved();
+        try {
+          onSaved();
+        } catch (error) {
+          console.error('Error in onSaved callback:', error);
+        }
       }
       onOpenChange(false);
     } catch (error) {
@@ -78,7 +105,11 @@ export default function LLMSettingsDialog({ open, onOpenChange, onSaved }) {
       });
       toast.success('All API keys cleared');
       if (onSaved) {
-        onSaved();
+        try {
+          onSaved();
+        } catch (error) {
+          console.error('Error in onSaved callback:', error);
+        }
       }
     }
   };

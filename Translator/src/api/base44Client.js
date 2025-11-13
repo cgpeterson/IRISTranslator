@@ -1,4 +1,4 @@
-// Google Gemini LLM Client (Dynamic Version + Retry Logic + Multi-Provider Support)
+// Multi-Provider LLM Client (Gemini, OpenAI, Anthropic, xAI) with Dynamic Model Selection and Retry Logic
 import { ProviderFactory } from './providers/ProviderFactory';
 import { secretManager } from '@/utils/secretManager';
 import { LLM_MODELS } from '@/config/llmModels';
@@ -92,10 +92,10 @@ class GeminiClient {
             if (!apiKey) {
               return `ERROR: API key not configured for ${model.name}.
 
-Please add your ${model.name} API key in the model selector settings.
+Please add your ${model.name} API key:
 
 1. Click the model selector in the top-right corner
-2. Select "Configure API Keys"
+2. Select a premium model to open the credentials dialog
 3. Add your ${model.name} API key
 4. Try again
 

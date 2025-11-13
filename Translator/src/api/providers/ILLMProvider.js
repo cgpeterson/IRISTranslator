@@ -10,9 +10,10 @@ export class ILLMProvider {
   /**
    * Generate content using the LLM
    * @param {string} prompt - The prompt to send to the LLM
+   * @param {string} modelId - The specific model ID to use for generation
    * @returns {Promise<string>} - The generated text
    */
-  async generateContent(prompt) {
+  async generateContent(prompt, modelId) {
     throw new Error('generateContent() must be implemented by subclass');
   }
 

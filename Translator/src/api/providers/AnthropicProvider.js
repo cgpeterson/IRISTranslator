@@ -10,11 +10,12 @@ export class AnthropicProvider extends ILLMProvider {
   }
 
   validateApiKey() {
-    // Anthropic keys typically start with "sk-ant-"
-    return this.apiKey && this.apiKey.startsWith('sk-ant-');
+    // Anthropic keys typically start with "sk-ant-" and are followed by at least 32 lowercase alphanumeric characters
+    const anthropicKeyRegex = /^sk-ant-[a-z0-9]{32,}$/;
+    return typeof this.apiKey === 'string' && anthropicKeyRegex.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'claude-3.5-sonnet') {
+  async generateContent(prompt, modelId = 'claude-3-5-sonnet-20241022') {
     try {
       const response = await fetch(this.baseUrl, {
         method: 'POST',
@@ -44,9 +45,13 @@ export class AnthropicProvider extends ILLMProvider {
           errorData = { message: errorText };
         }
 
-        throw new Error(
-          `Anthropic API error (${response.status}): ${errorData.error?.message || errorData.message || 'Unknown error'}`
-        );
+        // Log detailed error for debugging
+        console.error('Anthropic API error details:', {
+          status: response.status,
+          error: errorData.error?.message || errorData.message || errorData
+        });
+
+        throw new Error('Anthropic API request failed. Please check your API key and try again.');
       }
 
       const data = await response.json();

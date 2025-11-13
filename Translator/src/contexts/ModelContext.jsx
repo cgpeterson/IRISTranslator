@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LLM_MODELS, getDefaultModel } from '@/config/llmModels';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { LLM_MODELS, getDefaultModel, LLM_PROVIDERS } from '@/config/llmModels';
 import { secretManager } from '@/utils/secretManager';
 
 const ModelContext = createContext(null);
 
 const SELECTED_MODEL_KEY = 'iris_selected_model';
+const PROVIDER_KEYS = Object.values(LLM_PROVIDERS);
 
 export function ModelProvider({ children }) {
   const [currentModel, setCurrentModel] = useState(getDefaultModel());
@@ -18,25 +19,25 @@ export function ModelProvider({ children }) {
     }
   }, []);
 
+  // Stable reference for credential checking
+  const checkCredentials = useCallback(() => {
+    const statuses = {};
+    
+    PROVIDER_KEYS.forEach(provider => {
+      statuses[provider] = secretManager.hasApiKey(provider);
+    });
+    
+    setCredentialStatuses(statuses);
+  }, []);
+
   // Check credential status for all providers
   useEffect(() => {
-    const checkCredentials = () => {
-      const statuses = {};
-      const providers = ['gemini', 'openai', 'anthropic', 'xai'];
-      
-      providers.forEach(provider => {
-        statuses[provider] = secretManager.hasApiKey(provider);
-      });
-      
-      setCredentialStatuses(statuses);
-    };
-
     checkCredentials();
     
     // Re-check when storage changes (e.g., in another tab)
     window.addEventListener('storage', checkCredentials);
     return () => window.removeEventListener('storage', checkCredentials);
-  }, []);
+  }, [checkCredentials]);
 
   const selectModel = (modelId) => {
     const model = LLM_MODELS[modelId];
@@ -55,16 +56,9 @@ export function ModelProvider({ children }) {
     return true;
   };
 
-  const refreshCredentialStatus = () => {
-    const statuses = {};
-    const providers = ['gemini', 'openai', 'anthropic', 'xai'];
-    
-    providers.forEach(provider => {
-      statuses[provider] = secretManager.hasApiKey(provider);
-    });
-    
-    setCredentialStatuses(statuses);
-  };
+  const refreshCredentialStatus = useCallback(() => {
+    checkCredentials();
+  }, [checkCredentials]);
 
   const getConnectionStatus = (provider) => {
     return credentialStatuses[provider] || false;
