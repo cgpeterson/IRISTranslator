@@ -188,7 +188,7 @@ USER_INPUT:
 I need to finish this report by 5 PM.
 ---
 YOUR_TRANSLATION:
-I GOTTA GIT THIS HERE PAPERWORK DUN BY 5 OCLOCK M R DUCKS M R NOT C D E D B D I WINGS L I B M R DUCKS
+I GOTTA GIT DIS HER PAPERWORK DUN B 5 UR DA BOSS GONNA B MAD
 ---
 `,
       inputLabel: "Yer Fancy Talkin'",
@@ -290,7 +290,7 @@ USER_INPUT:
 I need to finish this report by 5 PM.
 ---
 YOUR_TRANSLATION:
-Thisss trivial document shall be completed by the appointed hour, lest my wwwwrath be kindled.
+Thisss trivial document shall be completed by the appointed hour, lest my wrrrrath be kindled.
 ---
 `,
       inputLabel: 'Plain English',
