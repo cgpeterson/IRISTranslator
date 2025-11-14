@@ -6,6 +6,7 @@ import AITranslatorPanel from '../components/translator/AITranslatorPanel';
 import ModelSelector from '../components/translator/ModelSelector';
 import LLMSettingsDialog from '../components/translator/LLMSettingsDialog';
 import RetrySettings from '../components/translator/RetrySettings';
+import AdDisplay from '../components/AdDisplay';
 import { translationModes } from '@iris-translator/common';
 import { categoryInfo } from '@/config/categoryInfo';
 import { useDropdown } from '@/hooks/useDropdown';
@@ -122,9 +123,19 @@ export default function Translator() {
           )}
         </div>
 
+        {/* Sidebar Ad */}
+        <div className="ad-wrapper-sidebar mt-8">
+          <AdDisplay slot="YOUR_SIDEBAR_AD_SLOT_ID_HERE" />
+        </div>
+
         {/* Footer */}
         <div className="mt-8 text-center text-slate-500 text-sm">
           <p>All translations happen in real-time. No data is stored.</p>
+        </div>
+
+        {/* Footer Ad */}
+        <div className="ad-wrapper-bottom mt-8">
+          <AdDisplay slot="YOUR_FOOTER_AD_SLOT_ID_HERE" />
         </div>
       </div>
 
