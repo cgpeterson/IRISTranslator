@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Settings } from 'lucide-react';
 import { useModel } from '@/contexts/ModelContext';
+import { RETRIES_PER_SET } from '@/config/retryConfig';
 import {
   Dialog,
   DialogContent,
@@ -70,14 +71,14 @@ export default function RetrySettings() {
                 className="bg-slate-900 border-slate-700 text-white"
               />
               <p className="text-xs text-slate-400">
-                Each set includes 3 retry attempts. Total retries: {tempValue ? parseInt(tempValue) * 3 : 0}
+                Each set includes {RETRIES_PER_SET} retry attempts. Total retries: {tempValue ? parseInt(tempValue) * RETRIES_PER_SET : 0}
               </p>
               {error && <p className="text-xs text-red-400">{error}</p>}
             </div>
 
             <div className="bg-slate-900 p-3 rounded-lg space-y-1">
               <p className="text-xs text-slate-400">
-                <strong className="text-slate-300">Current setting:</strong> {retrySets} set{retrySets !== 1 ? 's' : ''} ({retrySets * 3} total retries)
+                <strong className="text-slate-300">Current setting:</strong> {retrySets} set{retrySets !== 1 ? 's' : ''} ({retrySets * RETRIES_PER_SET} total retries)
               </p>
               <p className="text-xs text-slate-400">
                 Higher values increase reliability but may take longer for failed requests.

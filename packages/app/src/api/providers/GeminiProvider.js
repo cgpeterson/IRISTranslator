@@ -1,4 +1,5 @@
 import { ILLMProvider } from './ILLMProvider';
+import { RETRIES_PER_SET } from '@/config/retryConfig';
 
 /**
  * Google Gemini Provider
@@ -64,7 +65,7 @@ export class GeminiProvider extends ILLMProvider {
   }
 
   async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
-    const maxRetries = retrySets * 3; // Each set has 3 retries
+    const maxRetries = retrySets * RETRIES_PER_SET;
     let attempt = 0;
     let lastError = null;
 
