@@ -13,9 +13,10 @@ export class ILLMProvider {
    * @param {string} modelId - The specific model ID to use for generation
    * @param {number|null} sentenceLimit - Optional maximum number of sentences for the response (1-99)
    * @param {string|null} systemInstruction - Optional system instruction to guide the model's behavior
+   * @param {number} retrySets - Number of retry sets (each set = 3 retries). Default is 1 set (3 retries total)
    * @returns {Promise<string>} - The generated text
    */
-  async generateContent(prompt, modelId, sentenceLimit = null, systemInstruction = null) {
+  async generateContent(prompt, modelId, sentenceLimit = null, systemInstruction = null, retrySets = 1) {
     throw new Error('generateContent() must be implemented by subclass');
   }
 

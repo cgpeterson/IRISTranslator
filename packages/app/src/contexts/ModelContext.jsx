@@ -6,6 +6,7 @@ const ModelContext = createContext(null);
 
 const SELECTED_MODEL_KEY = 'iris_selected_model';
 const SENTENCE_LIMIT_KEY = 'iris_sentence_limit';
+const RETRY_SETS_KEY = 'iris_retry_sets';
 const PROVIDER_KEYS = Object.values(LLM_PROVIDERS);
 
 export function ModelProvider({ children }) {
@@ -14,6 +15,10 @@ export function ModelProvider({ children }) {
   const [sentenceLimit, setSentenceLimit] = useState(() => {
     const saved = localStorage.getItem(SENTENCE_LIMIT_KEY);
     return saved ? parseInt(saved, 10) : null;
+  });
+  const [retrySets, setRetrySets] = useState(() => {
+    const saved = localStorage.getItem(RETRY_SETS_KEY);
+    return saved ? parseInt(saved, 10) : 1; // Default to 1 set (3 retries)
   });
 
   // Load selected model from localStorage on mount
@@ -87,6 +92,17 @@ export function ModelProvider({ children }) {
     }
   };
 
+  const updateRetrySets = (sets) => {
+    // Validate: must be positive integer between 1-10
+    const numSets = parseInt(sets, 10);
+    if (!isNaN(numSets) && numSets >= 1 && numSets <= 10) {
+      setRetrySets(numSets);
+      localStorage.setItem(RETRY_SETS_KEY, numSets.toString());
+      return true;
+    }
+    return false;
+  };
+
   const value = {
     currentModel,
     selectModel,
@@ -96,6 +112,8 @@ export function ModelProvider({ children }) {
     refreshCredentialStatus,
     sentenceLimit,
     updateSentenceLimit,
+    retrySets,
+    updateRetrySets,
   };
 
   return (

@@ -1,23 +1,21 @@
 import { ILLMProvider } from './ILLMProvider';
 
 /**
- * OpenAI Provider (GPT-4o, O1, etc.)
+ * xAI Provider (Grok models)
  */
-export class OpenAIProvider extends ILLMProvider {
+export class XAIProvider extends ILLMProvider {
   constructor(apiKey) {
     super(apiKey);
-    this.baseUrl = 'https://api.openai.com/v1/chat/completions';
+    this.baseUrl = 'https://api.x.ai/v1/chat/completions';
   }
 
   validateApiKey() {
-    // OpenAI keys must match pattern: sk-[A-Za-z0-9]{48} or newer format
-    // Note: OpenAI has updated key formats, so we check for minimum length after prefix
-    return typeof this.apiKey === 'string' && 
-           this.apiKey.startsWith('sk-') && 
-           this.apiKey.length >= 20;
+    // xAI keys typically start with "xai-" followed by at least 32 alphanumeric characters
+    const xaiKeyPattern = /^xai-[a-zA-Z0-9]{32,}$/;
+    return typeof this.apiKey === 'string' && xaiKeyPattern.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null, systemInstruction = null) {
+  async generateContent(prompt, modelId = 'grok-beta', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
     try {
       // Define base system prompt
       let systemContent = systemInstruction || "You are a helpful assistant.";
@@ -60,12 +58,12 @@ export class OpenAIProvider extends ILLMProvider {
         }
 
         // Log detailed error for debugging
-        console.error('OpenAI API error details:', {
+        console.error('xAI API error details:', {
           status: response.status,
           error: errorData.error?.message || errorData.message || errorData
         });
 
-        throw new Error('OpenAI API request failed. Please check your API key and try again.');
+        throw new Error('xAI API request failed. Please check your API key and try again.');
       }
 
       const data = await response.json();
@@ -74,10 +72,10 @@ export class OpenAIProvider extends ILLMProvider {
         return data.choices[0].message.content;
       }
 
-      throw new Error('Unexpected response format from OpenAI API');
+      throw new Error('Unexpected response format from xAI API');
       
     } catch (error) {
-      throw new Error(`OpenAI request failed: ${error.message}`);
+      throw new Error(`xAI request failed: ${error.message}`);
     }
   }
 }
