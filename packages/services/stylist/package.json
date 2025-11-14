@@ -1,0 +1,23 @@
+{
+  "name": "@iris-translator/stylist",
+  "version": "1.0.0",
+  "description": "LLM-based translation service for IRIS Translator",
+  "type": "module",
+  "main": "api/translate.js",
+  "scripts": {
+    "dev": "node --watch api/translate.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@iris-translator/common": "1.0.0"
+  },
+  "keywords": [
+    "iris-translator",
+    "llm",
+    "translation",
+    "service"
+  ],
+  "author": "",
+  "license": "MIT"
+}

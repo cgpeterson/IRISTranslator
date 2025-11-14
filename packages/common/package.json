@@ -1,0 +1,20 @@
+{
+  "name": "@iris-translator/common",
+  "version": "1.0.0",
+  "description": "Shared common utilities and configurations for IRIS Translator",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "iris-translator",
+    "shared",
+    "common"
+  ],
+  "author": "",
+  "license": "MIT"
+}

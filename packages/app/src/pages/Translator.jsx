@@ -6,7 +6,7 @@ import AITranslatorPanel from '../components/translator/AITranslatorPanel';
 import ModelSelector from '../components/translator/ModelSelector';
 import LLMSettingsDialog from '../components/translator/LLMSettingsDialog';
 import RetrySettings from '../components/translator/RetrySettings';
-import { translationModes } from '@/config/translationModes';
+import { translationModes } from '@iris-translator/common';
 import { categoryInfo } from '@/config/categoryInfo';
 import { useDropdown } from '@/hooks/useDropdown';
 import { useModel } from '@/contexts/ModelContext';

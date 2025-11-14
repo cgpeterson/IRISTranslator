@@ -4,7 +4,8 @@
   "private": true,
   "description": "IRISTranslator - A monorepo demonstrating modern LLM infrastructure concepts with Skills and MCP",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/services/*"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=packages/app",
