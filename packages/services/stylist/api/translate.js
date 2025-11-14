@@ -33,7 +33,7 @@ import { translationModes } from '@iris-translator/common';
  */
 function findModeById(modeId) {
   // Search through all categories to find the mode
-  for (const [category, modes] of Object.entries(translationModes)) {
+  for (const modes of Object.values(translationModes)) {
     const mode = modes.find(m => m.id === modeId);
     if (mode) {
       return mode;
@@ -53,14 +53,23 @@ export async function translateText(req) {
     const { text, modeId } = req.body || req;
     
     // Validate input
-    if (!text || typeof text !== 'string') {
+    if (!text || typeof text !== 'string' || !text.trim()) {
       return {
         status: 400,
         body: { error: 'Missing or invalid "text" parameter' }
       };
     }
     
-    if (!modeId || typeof modeId !== 'string') {
+    // Enforce maximum text length (e.g., 10,000 characters)
+    const MAX_TEXT_LENGTH = 10000;
+    if (text.length > MAX_TEXT_LENGTH) {
+      return {
+        status: 400,
+        body: { error: `"text" parameter exceeds maximum length of ${MAX_TEXT_LENGTH} characters` }
+      };
+    }
+    
+    if (!modeId || typeof modeId !== 'string' || !modeId.trim()) {
       return {
         status: 400,
         body: { error: 'Missing or invalid "modeId" parameter' }
@@ -89,7 +98,7 @@ export async function translateText(req) {
     if (!apiKey) {
       return {
         status: 500,
-        body: { error: 'GEMINI_API_KEY not configured' }
+        body: { error: 'Service configuration error' }
       };
     }
     
@@ -122,7 +131,7 @@ export async function translateText(req) {
     console.error('Translation error:', error);
     return {
       status: 500,
-      body: { error: `Translation failed: ${error.message}` }
+      body: { error: 'Translation failed. Please try again later.' }
     };
   }
 }
@@ -131,6 +140,11 @@ export async function translateText(req) {
  * Serverless function handler (Vercel/Netlify compatible)
  */
 export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();

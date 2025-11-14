@@ -66,7 +66,7 @@ Translates text using a specified translation mode.
 The service supports all LLM-based modes from `@iris-translator/common`:
 
 ### Literary
-- `shakespeare` - Shakespearian English
+- `shakespeare` - Shakespearean English
 - `haiku` - Haiku poetry (5-7-5)
 - `iambic` - Iambic Pentameter
 

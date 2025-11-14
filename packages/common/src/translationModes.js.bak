@@ -89,10 +89,10 @@ export const translationModes = {
       id: 'decipher',
       name: 'Universal Decipher',
       color: 'purple',
-      prompt: `You are an expert universal translator. Your job is to take any text provided—it could be code (like Base64), old English (like Shakespearean), slang (like Pirate or Cowboy), or just confusing text—and translate it into a very concise, modern, and informal/slang summary. Think of how a developer would summarize a complex idea to a colleague. For example, if the input is Base64 for "The airy streams and courses of the sky / Do know my hand, for I have set them right...", the ideal output is "I got those cloudflows right now". Your summary must be very concise, complete, and ideally three sentences or less. If it's code, first decode it, then translate the decoded text. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate the following:`,
+      prompt: `You are an expert universal translator. Your job is to take any text provided—it could be code (like Base64), old English (like Shakespearian), slang (like Pirate or Cowboy), or just confusing text—and translate it into a very concise, modern, and informal/slang summary. Think of how a developer would summarize a complex idea to a colleague. For example, if the input is Base64 for "The airy streams and courses of the sky / Do know my hand, for I have set them right...", the ideal output is "I got those cloudflows right now". Your summary must be very concise, complete, and ideally three sentences or less. If it's code, first decode it, then translate the decoded text. Do not use any markdown, asterisks, or special formatting. Return only the translated plain text. Translate the following:`,
       inputLabel: 'Encoded / Obscured Text',
       outputLabel: 'Clear Modern English',
-      placeholder: 'Paste Base64, Pirate, Shakespearean, etc...',
+      placeholder: 'Paste Base64, Pirate, Shakespearian, etc...',
     }
   ],
   fantasy: [

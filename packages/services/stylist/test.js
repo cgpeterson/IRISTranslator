@@ -9,7 +9,7 @@
 import { translateText } from './api/translate.js';
 
 console.log('🧪 Testing Stylist Translation Service\n');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 /**
  * Run a test case
