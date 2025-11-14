@@ -1,0 +1,25 @@
+{
+  "name": "iris-translator-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IRISTranslator - A monorepo demonstrating modern LLM infrastructure concepts with Skills and MCP",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/app",
+    "build": "npm run build --workspace=packages/app",
+    "lint": "npm run lint --workspace=packages/app",
+    "preview": "npm run preview --workspace=packages/app"
+  },
+  "keywords": [
+    "monorepo",
+    "translator",
+    "llm",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  }
+}
