@@ -6,7 +6,7 @@
   "main": "api/translate.js",
   "scripts": {
     "dev": "node --watch api/translate.js",
-    "test": "echo \"No tests yet\""
+    "test": "node test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
