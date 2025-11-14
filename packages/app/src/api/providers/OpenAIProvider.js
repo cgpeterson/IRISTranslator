@@ -17,7 +17,7 @@ export class OpenAIProvider extends ILLMProvider {
            this.apiKey.length >= 20;
   }
 
-  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null, systemInstruction = null) {
+  async generateContent(prompt, modelId = 'gpt-4o', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
     try {
       // Define base system prompt
       let systemContent = systemInstruction || "You are a helpful assistant.";

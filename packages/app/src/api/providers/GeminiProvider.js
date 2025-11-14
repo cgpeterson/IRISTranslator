@@ -63,8 +63,8 @@ export class GeminiProvider extends ILLMProvider {
     }
   }
 
-  async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null, systemInstruction = null) {
-    const maxRetries = 3;
+  async generateContent(prompt, modelId = 'gemini-1.5-flash', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
+    const maxRetries = retrySets * 3; // Each set has 3 retries
     let attempt = 0;
     let lastError = null;
 

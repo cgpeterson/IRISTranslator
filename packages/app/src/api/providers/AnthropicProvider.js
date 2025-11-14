@@ -15,7 +15,7 @@ export class AnthropicProvider extends ILLMProvider {
     return typeof this.apiKey === 'string' && anthropicKeyRegex.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'claude-3-5-sonnet-20241022', sentenceLimit = null, systemInstruction = null) {
+  async generateContent(prompt, modelId = 'claude-3-5-sonnet-20241022', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
     try {
       // Construct the user message
       let userMessage = prompt;

@@ -5,6 +5,7 @@ import EncodingPanel from '../components/translator/EncodingPanel';
 import AITranslatorPanel from '../components/translator/AITranslatorPanel';
 import ModelSelector from '../components/translator/ModelSelector';
 import LLMSettingsDialog from '../components/translator/LLMSettingsDialog';
+import RetrySettings from '../components/translator/RetrySettings';
 import { translationModes } from '@/config/translationModes';
 import { categoryInfo } from '@/config/categoryInfo';
 import { useDropdown } from '@/hooks/useDropdown';
@@ -51,6 +52,12 @@ export default function Translator() {
 
           {/* Menu Bar with Model Selector */}
           <div className="flex justify-between items-center gap-4">
+            {/* Left side: Retry Settings */}
+            <div className="flex items-center gap-2">
+              <RetrySettings />
+            </div>
+
+            {/* Center: Navigation */}
             <nav ref={dropdownRef} className="flex justify-center gap-2 flex-wrap flex-1">
               {Object.entries(translationModes).map(([category, modes]) => (
                 <div key={category} className="relative">

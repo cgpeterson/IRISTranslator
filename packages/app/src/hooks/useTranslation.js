@@ -12,7 +12,7 @@ export function useTranslation(mode) {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { currentModel, sentenceLimit } = useModel();
+  const { currentModel, sentenceLimit, retrySets } = useModel();
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -28,6 +28,7 @@ export function useTranslation(mode) {
       const invocationParams = {
         modelId: currentModel.id,
         sentenceLimit: sentenceLimit,
+        retrySets: retrySets,
       };
 
       if (mode.systemInstruction) {

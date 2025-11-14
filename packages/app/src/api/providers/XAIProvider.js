@@ -15,7 +15,7 @@ export class XAIProvider extends ILLMProvider {
     return typeof this.apiKey === 'string' && xaiKeyPattern.test(this.apiKey);
   }
 
-  async generateContent(prompt, modelId = 'grok-beta', sentenceLimit = null, systemInstruction = null) {
+  async generateContent(prompt, modelId = 'grok-beta', sentenceLimit = null, systemInstruction = null, retrySets = 1) {
     try {
       // Define base system prompt
       let systemContent = systemInstruction || "You are a helpful assistant.";
